@@ -1,0 +1,24 @@
+{
+  "name": "superagents",
+  "version": "1.0.0",
+  "description": "Full-featured Research-Plan-Implement (RPI) workflow with Test-Driven Development (TDD)",
+  "author": {
+    "name": "Hivemind AI",
+    "url": "https://github.com/hivemind-ai"
+  },
+  "homepage": "https://github.com/hivemind-ai/superagents",
+  "repository": "https://github.com/hivemind-ai/superagents",
+  "license": "MIT",
+  "keywords": [
+    "rpi",
+    "tdd",
+    "red-green-refactor",
+    "workflow",
+    "agents",
+    "skills",
+    "research",
+    "planning",
+    "implementation"
+  ],
+  "hooks": "./hooks/hooks.json"
+}

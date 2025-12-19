@@ -1,0 +1,12 @@
+{
+  "name": "superagents-hooks",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "bun build hooks.ts --outdir dist --target node"
+  },
+  "devDependencies": {
+    "bun-types": "latest",
+    "typescript": "^5.0.0"
+  }
+}

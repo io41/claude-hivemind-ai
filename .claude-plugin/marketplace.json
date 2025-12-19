@@ -1,0 +1,15 @@
+{
+  "name": "hivemind-ai",
+  "owner": {
+    "name": "Hivemind AI",
+    "url": "https://github.com/hivemind-ai"
+  },
+  "description": "A Claude Code marketplace for agentic plugins, skills, and workflows",
+  "plugins": [
+    {
+      "name": "superagents",
+      "source": "./superagents",
+      "description": "Full-featured Research-Plan-Implement (RPI) workflow with Test-Driven Development (TDD)"
+    }
+  ]
+}
