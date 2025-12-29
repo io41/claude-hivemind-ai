@@ -1,10 +1,10 @@
 ---
-description: Execute the RPI workflow (Research-Plan-Implement with TDD) for the next queued item
+description: Execute the RPI workflow (Research-Plan-Implement with TDD) for the next todo item
 ---
 
 # /work Command
 
-Execute the RPI workflow for the next item in the processing queue.
+Execute the RPI workflow for queued items. **Continues automatically until queue is empty.**
 
 ## Process
 
@@ -78,6 +78,20 @@ Then update queue:
 
 **Goal**: Keep active work directory lean for next item.
 
+### 7. CONTINUE (Loop)
+
+After archiving, check queue for more items:
+
+```
+if queued.md has items in "## Up Next":
+    → Go back to Step 0 (Get Next Queued Item)
+    → Process next item automatically
+else:
+    → Report "Queue empty" and stop
+```
+
+**IMPORTANT**: This command loops until the queue is empty. Each item uses sub-agents to keep context fresh, so the loop can continue indefinitely.
+
 ## Output
 
 Display progress for each phase:
@@ -118,13 +132,16 @@ Archiving completed work...
 ✓ Moved to .agents/archive/<slug>/
 ✓ Updated completed.md
 
-✓ Work complete!
+✓ Work item complete!
 
-Queue status:
-  In Progress: (none)
-  Up Next: <N> items remaining
+---
 
-Run /work to continue processing.
+Continuing with next item: <next-slug>
+[... repeats for each item ...]
+
+---
+
+✓ All work complete! Queue is empty.
 ```
 
 ## Queue Empty

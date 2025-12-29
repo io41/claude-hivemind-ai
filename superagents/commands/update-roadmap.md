@@ -41,7 +41,11 @@ Use `roadmap-updater` agent to:
 ...
 ```
 
-#### Create work item directories:
+#### Create work item directories (Parallel):
+
+**If 5+ work items**: Use parallel Task agents with `run_in_background: true` to create directories simultaneously. Each agent creates one `definition.md` file, then consolidate.
+
+**If <5 work items**: Create sequentially.
 
 For each work item, create `.agents/work/{slug}/definition.md`:
 ```markdown

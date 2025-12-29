@@ -21,23 +21,44 @@ Returns object with:
 
 ## Process
 
-1. **Load Specification Files**
-   - Read all markdown files in `spec/` directory
+### 1. Load and Parallelize
+
+**If multiple spec files exist, process in parallel:**
+
+```
+spec/
+├── auth.md        ─→ Task agent 1 ─┐
+├── user-mgmt.md   ─→ Task agent 2 ─┼─→ consolidate
+├── api.md         ─→ Task agent 3 ─┘
+```
+
+Launch one `haiku` Task agent per spec file with `run_in_background: true`:
+- Each agent extracts requirements from its assigned file
+- Use `TaskOutput` to collect all results
+- Consolidate into unified requirements list
+
+**For single file or small projects**: Process sequentially.
+
+### 2. Per-File Analysis
+
+Each parallel agent:
+   - Read assigned markdown file
    - Parse markdown structure
    - Extract headers, lists, tables, code blocks
 
-2. **Identify Requirements**
+### 3. Identify Requirements
    - Functional requirements (what system should do)
    - Non-functional requirements (performance, security, etc.)
    - Business requirements (user needs, goals)
    - Technical requirements (technologies, integrations)
 
-3. **Group Into Features**
+### 4. Group Into Features (Consolidation)
    - Combine related requirements into features
    - Identify feature dependencies
    - Estimate feature complexity
+   - Merge duplicates from parallel analysis
 
-4. **Extract Constraints**
+### 5. Extract Constraints
    - Technical constraints (tech stack, performance)
    - Business constraints (timeline, budget)
    - Regulatory constraints (GDPR, security)

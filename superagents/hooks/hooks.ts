@@ -424,11 +424,12 @@ const stop = async (payload: StopPayload): Promise<StopResponse> => {
     reason += `${queueStatus.count} item${queueStatus.count > 1 ? 's' : ''} remaining in queue: ${queueStatus.items.slice(0, 3).join(', ')}${queueStatus.count > 3 ? '...' : ''}.`
   }
 
-  reason += ' Run /work to continue processing.'
+  reason += ' You MUST run /work now to continue processing the queue.'
 
   return {
     decision: 'block',
     reason,
+    continue: true, // Signal to continue working
   }
 }
 

@@ -26,20 +26,32 @@ Read `.agents/work/{slug}/definition.md`:
 - Extract acceptance criteria
 - Note priority and any constraints
 
-### 2. Load Relevant Context
+### 2. Load Relevant Context (Parallel Fan-Out)
 
-Just-in-time loading - only what this work item needs:
+Use parallel Task agents to gather context simultaneously:
 
 ```
-1. Read definition.md → get requirements
-2. Read relevant spec section (not all specs)
-3. Read relevant architecture section (not all docs)
-4. Scan for related existing code
-5. Check patterns index → load only matching patterns
-6. Check mistakes index → load only matching mistakes
+                    ┌─→ spec-reader agent ─────────→┐
+                    │                               │
+definition.md ──────┼─→ architecture-reader agent ─→┼──→ consolidate
+                    │                               │
+                    ├─→ code-scanner agent ────────→┤
+                    │                               │
+                    └─→ patterns-reader agent ─────→┘
 ```
 
-Don't load everything upfront. Pull what's needed.
+**Launch 4 parallel agents** with `run_in_background: true`:
+
+| Agent | Task | Input | Output |
+|-------|------|-------|--------|
+| spec-reader | Find relevant spec sections | definition keywords | Relevant requirements |
+| architecture-reader | Find relevant architecture | definition keywords | System context |
+| code-scanner | Find related existing code | definition keywords | Related files, patterns |
+| patterns-reader | Check patterns + mistakes | definition keywords | Applicable patterns/warnings |
+
+**Consolidation**: Wait for all agents, merge findings into unified research.
+
+This reduces research time from ~4 sequential reads to ~1 parallel batch.
 
 ### 3. Right-Size Check (Heijunka)
 
