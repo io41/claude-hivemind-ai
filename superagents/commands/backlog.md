@@ -4,17 +4,33 @@ description: Add a new work item to the backlog interactively
 
 # /backlog Command
 
-Interactive work item creation. Asks questions to define a new work item and adds it to the backlog.
+Add a work item to the backlog. **This command ONLY creates backlog entries - it does NOT investigate, research, or work on the item.**
+
+## Critical Rule
+
+**DO NOT** investigate, analyze, research, or attempt to understand the work item content. Your ONLY job is to:
+1. Take the user's description as-is (literal text)
+2. Create the backlog entry
+3. Confirm it was added
+
+The description might be a bug report, feature request, or task - treat it as opaque text to store, not something to act on.
+
+## Arguments
+
+If called with arguments (e.g., `/backlog Fix the login bug`), use the arguments as the description directly. Skip asking for description, just ask for priority.
 
 ## Process
 
 ### 1. Gather Information
 
-Ask the user a series of questions:
+**If arguments provided** (e.g., `/backlog Fix the React hooks error`):
+- Use arguments as the description (verbatim, do not interpret)
+- Only ask for priority
 
-1. **Description**: "What work needs to be done?" (brief description)
-2. **Details**: "Any additional context or requirements?" (optional details)
-3. **Priority**: "What priority?" (high/medium/low)
+**If no arguments**:
+Ask the user:
+1. **Description**: "What work needs to be done?" (use their answer verbatim)
+2. **Priority**: "What priority?" (high/medium/low)
 
 ### 2. Generate Slug
 
