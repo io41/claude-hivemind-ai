@@ -8,7 +8,7 @@ Create properly formatted git commits with conventional commit message format.
 
 ## Input
 
-- `phase` - Current phase (red, green, refactor, docs)
+- `phase` - Current phase (red, green, refactor, docs, chore)
 - `changes` - Summary of changes made
 - `workItem` - Related work item name
 
@@ -64,6 +64,19 @@ feat(auth): implement authentication system
 - Add AuthService with JWT support
 - Implement password hashing with bcrypt
 - Add authentication middleware
+
+🤖 Generated with Claude Code
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+```
+
+### ARCHIVE Phase (chore)
+```
+chore(auth): archive completed work
+
+- Update queued.md and completed.md
+- Move work item to archive
+- Clear workflow state
 
 🤖 Generated with Claude Code
 

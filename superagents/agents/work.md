@@ -137,6 +137,17 @@ Call `archive-work` agent:
    }
    ```
 
+### 10. Final Commit
+
+**CRITICAL**: Create a housekeeping commit for all queue/workflow changes:
+
+Call `git-commit` agent:
+- Input: `{ phase: "chore", changes: "Archive completed work", workItem: "{slug}" }`
+- Stage: `queued.md`, `completed.md`, `workflow.json`, `.agents/archive/`
+- Output: `{ commitHash: "...", commitMessage: "chore(scope): archive completed work" }`
+
+This ensures all workflow state changes are tracked in version control.
+
 ## Agent Calls
 
 | Phase | Agent | Input | Output |
@@ -147,6 +158,7 @@ Call `archive-work` agent:
 | REFACTOR | rpi | `{ slug, phase: "refactor" }` | commit hash, changes |
 | Architecture | architecture | `{ slug }` | commit hash, docs |
 | Archive | archive-work | `{ slug, commits }` | archive path |
+| Final Commit | git-commit | `{ phase: "chore", workItem }` | commit hash |
 
 ## Error Handling
 
@@ -172,9 +184,10 @@ If any phase fails:
     "red": { "success": true, "tests": 8, "commit": "a1b2c3d" },
     "green": { "success": true, "passRate": 100, "commit": "d4e5f6g" },
     "refactor": { "success": true, "changes": 3, "commit": "h7i8j9k" },
-    "architecture": { "success": true, "docs": 2, "commit": "l0m1n2o" }
+    "architecture": { "success": true, "docs": 2, "commit": "l0m1n2o" },
+    "archive": { "success": true, "commit": "p3q4r5s" }
   },
-  "commits": ["a1b2c3d", "d4e5f6g", "h7i8j9k", "l0m1n2o"],
+  "commits": ["a1b2c3d", "d4e5f6g", "h7i8j9k", "l0m1n2o", "p3q4r5s"],
   "success": true,
   "summary": "Completed user authentication with 8 tests, 100% passing. 3 refactorings applied."
 }

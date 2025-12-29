@@ -174,6 +174,7 @@ If any step fails:
 2. **Single-Piece Flow** - One test (GREEN) or one change (REFACTOR) at a time
 3. **Gate Enforcement** - Never commit without verify-results approval
 4. **Eliminate Waste** - Write only what tests demand
+5. **Always Commit** - EVERY phase MUST end with a git commit. No phase is complete without a commit hash returned.
 
 ## Token Budget
 

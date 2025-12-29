@@ -78,7 +78,15 @@ Then update queue:
 
 **Goal**: Keep active work directory lean for next item.
 
-### 7. CONTINUE (Loop)
+### 7. FINAL COMMIT
+
+After queue files are updated, create a final commit for housekeeping:
+- Stage: `queued.md`, `completed.md`, `workflow.json`, archive changes
+- Commit: `chore(<scope>): archive completed work`
+
+**CRITICAL**: This commit ensures all queue/workflow state changes are tracked in git.
+
+### 8. CONTINUE (Loop)
 
 After archiving, check queue for more items:
 
@@ -131,6 +139,7 @@ Architecture updated
 Archiving completed work...
 ✓ Moved to .agents/archive/<slug>/
 ✓ Updated completed.md
+✓ Committed: chore(<scope>): archive completed work [<hash>]
 
 ✓ Work item complete!
 
