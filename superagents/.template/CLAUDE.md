@@ -1,6 +1,6 @@
 # RPI Workflow
 
-<!-- superagents:1.0.1 -->
+<!-- superagents:1.1.1 -->
 
 Research-Plan-Implement with TDD. Quality built in, not inspected in.
 
@@ -30,8 +30,8 @@ The `verify-results` agent gates all commits. `canProceed: true` required.
 ```
 /work → research → RED → GREEN → REFACTOR → architecture → archive
                     ↓       ↓         ↓            ↓           ↓
-                 tests   one test   one change   docs    remove from
-                 fail    at a time  at a time   update   active files
+                 tests   one test   one change   docs    move to
+                 fail    at a time  at a time   update   archive/
 ```
 
 ## Phase Rules
@@ -42,40 +42,48 @@ The `verify-results` agent gates all commits. `canProceed: true` required.
 | RED | Write 1-5 tests for work item | Tests fail correctly |
 | GREEN | Pass one test, then next | 100% pass, zero type errors, integrated |
 | REFACTOR | One change, verify, next | 100% pass, zero type errors |
-| ARCHIVE | Remove from active, move to archive | Item in done.md, artifacts archived |
+| ARCHIVE | Move work dir to archive | Item in completed.md, artifacts archived |
+
+## Queue System
+
+Work flows through a queue:
+
+```
+backlog.md → queued.md → completed.md
+     ↓           ↓            ↓
+  waiting    processing    finished
+```
+
+- `/queue-add` moves items from backlog to queue
+- `/work` processes items from queue (auto-continues until empty)
+- Completed items archived to `.agents/archive/<slug>/`
 
 ## Workflow Artifacts
 
-Each workflow phase produces artifacts stored in `.agents/`. These MUST be created regardless of how work is initiated.
-
-| Directory | Purpose | When Created |
-|-----------|---------|--------------|
-| `.agents/research/` | Research findings, analysis | Before RED phase |
-| `.agents/plans/` | Implementation plans | Before each phase |
-| `.agents/work/` | Active work state | During work |
-
-### Artifact Flow
+Each work item has its own directory with all artifacts:
 
 ```
-Research → .agents/research/{slug}.md
-    ↓
-RED reads research → writes .agents/plans/{slug}-red.md
-    ↓
-GREEN reads research + red plan → writes .agents/plans/{slug}-green.md
-    ↓
-REFACTOR reads all above → writes .agents/plans/{slug}-refactor.md
+.agents/work/<slug>/
+├── definition.md       # Work item description
+├── research.md         # Master research
+├── red-research.md     # RED phase research
+├── red-plan.md         # RED phase plan
+├── green-research.md   # GREEN phase research
+├── green-plan.md       # GREEN phase plan
+├── refactor-research.md
+├── refactor-plan.md
+└── report.md           # Combined results
 ```
 
 ## Key Files
 
 | Purpose | Path |
 |---------|------|
-| Current work | `.agents/todos/todo.md` |
-| Research artifacts | `.agents/research/` |
-| Phase plans | `.agents/plans/` |
-| Work state | `.agents/work/` |
-| **Completed work** | `.agents/archive/done.md` |
-| Archived artifacts | `.agents/archive/` |
+| Backlog (waiting) | `.agents/work/backlog.md` |
+| Queue (processing) | `.agents/work/queued.md` |
+| Completed | `.agents/work/completed.md` |
+| Work items | `.agents/work/<slug>/` |
+| **Archived work** | `.agents/archive/<slug>/` |
 | Phase guidance | `.agents/context/phase-*.md` |
 | Artifact guidance | `.agents/context/artifacts.md` |
 | Patterns | `.agents/patterns/` |
@@ -97,34 +105,42 @@ Read index files first to find relevant files without searching.
 **Goal**: Minimize context usage by keeping active files lean.
 
 When a work item completes:
-1. **Removed** from `todo.md` (not marked complete - REMOVED)
-2. **Removed** from `ROADMAP.md`
-3. **Moved** to archive: research, plans, work state
-4. **Entry added** to `.agents/archive/done.md`
+1. **Moved** entire `.agents/work/<slug>/` to `.agents/archive/<slug>/`
+2. **Removed** from `queued.md`
+3. **Added** to `completed.md`
+4. **Entry added** to `.agents/archive/index.md`
 
 ### Archive Structure
 
 ```
 .agents/archive/
-├── done.md              # List of completed work with summaries
-├── research/            # Archived research artifacts
-├── plans/               # Archived execution plans
-└── work/                # Archived work state files
+├── index.md             # List of archived work items
+├── auth-system/         # Archived work item
+│   ├── definition.md
+│   ├── research.md
+│   ├── *-research.md
+│   ├── *-plan.md
+│   └── report.md
+└── user-profile/        # Another archived item
+    └── ...
 ```
 
 ### Why Archive?
 
-- `todo.md` only shows pending/in-progress work
-- `ROADMAP.md` only shows remaining phases
-- Research/plans directories only contain active work
+- `queued.md` only shows pending/in-progress work
+- `backlog.md` only shows waiting items
+- Work directories only contain active work
 - Context window usage minimized when checking "what's next"
 
-To view history: read `.agents/archive/done.md`
+To view history: read `.agents/archive/index.md`
 
 ## Commands
 
-- `/work` - Execute RPI workflow for next todo
-- `/update-roadmap` - Generate roadmap from spec
+- `/work` - Execute RPI workflow (continues until queue empty)
+- `/backlog` - Add work items interactively
+- `/queue-add` - Move items from backlog to queue
+- `/queue-status` - Show current queue state
+- `/update-roadmap` - Generate roadmap and backlog from spec
 - `/project-status` - Show current state
 - `/fix-tests` - Systematic test repair
 - `/update-architecture` - Update architecture docs with diagrams

@@ -158,12 +158,12 @@ Handle schema changes between versions:
 - Add `initializedAt` field if missing (set to null)
 - Add `workUntil` field if missing (set to null)
 - Add `workItemStartedAt` field if missing (set to null)
-- Update CLAUDE.md with `<!-- superagents:1.0.1 -->` version marker
+- Update CLAUDE.md with `<!-- superagents:1.1.1 -->` version marker
 
 #### CLAUDE.md Version Detection
 The CLAUDE.md file contains a version marker comment:
 ```html
-<!-- superagents:1.0.1 -->
+<!-- superagents:1.1.1 -->
 ```
 
 During upgrade:
@@ -172,7 +172,7 @@ During upgrade:
 3. If older or missing, replace the RPI Workflow section with latest template
 4. If not found, append the RPI Workflow section
 
-#### 1.0.1 → 1.0.2 (Queue System Migration)
+#### 1.0.1 → 1.1.1 (Queue System Migration)
 
 **Directory structure changes:**
 - Create `.agents/work/backlog.md`, `queued.md`, `completed.md`
@@ -208,7 +208,7 @@ Document here as versions are released.
 Superagents RPI Workflow Setup
 ==============================
 Mode: Fresh Install
-Plugin Version: 1.0.1
+Plugin Version: 1.1.1
 
 Creating directory structure...
 ✓ Created .agents/ (14 directories)
@@ -218,7 +218,7 @@ Creating directory structure...
 Creating files...
 ✓ Created context files (6 files)
 ✓ Created index files (12 files)
-✓ Created workflow.json (v1.0.1)
+✓ Created workflow.json (v1.1.1)
 ✓ Created ROADMAP.md template
 ✓ Created todo.md template
 ✓ Created done.md
@@ -237,7 +237,7 @@ Next steps:
 Superagents RPI Workflow Setup
 ==============================
 Mode: Upgrade
-Installed: 1.0.0 → Plugin: 1.0.1
+Installed: 1.0.1 → Plugin: 1.1.1
 
 Checking structure...
 ✓ All directories present
@@ -258,7 +258,7 @@ Preserved (not modified):
 - 1 mistake
 - todo.md content
 
-Upgrade complete! Now at v1.0.1
+Upgrade complete! Now at v1.1.1
 ```
 
 ### Repair
@@ -266,7 +266,7 @@ Upgrade complete! Now at v1.0.1
 Superagents RPI Workflow Setup
 ==============================
 Mode: Repair
-Plugin Version: 1.0.1
+Plugin Version: 1.1.1
 
 Validation Results:
 ✗ .agents/workflow.json - Invalid JSON
@@ -289,12 +289,12 @@ to ensure state is correct.
 Superagents RPI Workflow Setup
 ==============================
 Mode: Validation
-Plugin Version: 1.0.1
+Plugin Version: 1.1.1
 
 Validation Results:
 ✓ All 18 required directories present
 ✓ All 12 required files present
-✓ workflow.json valid (v1.0.1)
+✓ workflow.json valid (v1.1.1)
 ✓ All context files valid
 ✓ All index files valid
 
