@@ -1,36 +1,44 @@
 # Work Index
 
-Active work-in-progress files. Created during /work execution.
+Work item management and active work tracking.
 
-## Files
+## Queue Files
 
-_No active work. Files created during /work execution._
+| File | Purpose |
+|------|---------|
+| `backlog.md` | Priority-ordered work items waiting to be queued |
+| `queued.md` | Work items ready for processing |
+| `completed.md` | Finished work items (before archival) |
 
 ## Structure
 
-During work, a directory is created for each work item:
+Each work item has its own directory containing all artifacts:
 
 ```
 work/
-└── {work-item-slug}/
-    ├── state.json       # Current phase, progress
-    └── notes.md         # Working notes (optional)
+├── backlog.md           # Priority-ordered backlog
+├── queued.md            # Processing queue
+├── completed.md         # Finished items
+└── {work-item-slug}/    # Per-item directory
+    ├── definition.md    # Work item description
+    ├── research.md      # Master research from spec/architecture
+    ├── red-research.md  # RED phase research
+    ├── red-plan.md      # RED phase plan
+    ├── green-research.md
+    ├── green-plan.md
+    ├── refactor-research.md
+    ├── refactor-plan.md
+    └── report.md        # Combined R-G-R results
 ```
 
-## state.json Format
+## Workflow
 
-```json
-{
-  "workItem": "work-item-slug",
-  "phase": "red|green|refactor|complete",
-  "startedAt": "ISO timestamp",
-  "updatedAt": "ISO timestamp",
-  "redCommit": "hash (if complete)",
-  "greenCommit": "hash (if complete)",
-  "refactorCommit": "hash (if complete)"
-}
-```
+1. Items start in `backlog.md` (from `/update-roadmap` or `/backlog`)
+2. `/queue-add` moves items to `queued.md`
+3. `/work` processes the next item in queue
+4. Completed items move to `completed.md`
+5. Archive agent moves to `.agents/archive/{slug}/`
 
-## Cleanup
+## Queue Status
 
-Work directories can be deleted after work item is complete and commits are made.
+Use `/queue-status` to view current queue state.

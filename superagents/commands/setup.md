@@ -38,19 +38,17 @@ Required directories (must exist):
   .agents/context/
   .agents/patterns/
   .agents/mistakes/
-  .agents/research/
-  .agents/plans/
-  .agents/plans/diagrams/
-  .agents/todos/
-  .agents/work/
-  .agents/archive/
-  .agents/archive/research/
-  .agents/archive/plans/
-  .agents/archive/work/
+  .agents/work/                  # Queue files and work item directories
+  .agents/archive/               # Archived completed work items
   architecture/
   architecture/diagrams/
   spec/
   spec/diagrams/
+
+Legacy directories (for migration):
+  .agents/todos/                 # Old todo.md location (migrated to .agents/work/)
+  .agents/research/              # Old research location (migrated to .agents/work/<slug>/)
+  .agents/plans/                 # Old plans location (migrated to .agents/work/<slug>/)
 ```
 
 #### Required Files (must exist and be valid)
@@ -64,8 +62,11 @@ Required directories (must exist):
 .agents/context/phase-refactor.md
 .agents/context/testing.md
 .agents/context/artifacts.md
-.agents/todos/todo.md        # Must exist
-.agents/archive/done.md      # Must exist
+.agents/work/backlog.md      # Priority-ordered backlog
+.agents/work/queued.md       # Processing queue
+.agents/work/completed.md    # Recently completed items
+.agents/work/index.md        # Work directory index
+.agents/archive/index.md     # Archive index
 ```
 
 #### File Format Validation
@@ -170,6 +171,32 @@ During upgrade:
 2. If found, extract version and compare
 3. If older or missing, replace the RPI Workflow section with latest template
 4. If not found, append the RPI Workflow section
+
+#### 1.0.1 → 1.0.2 (Queue System Migration)
+
+**Directory structure changes:**
+- Create `.agents/work/backlog.md`, `queued.md`, `completed.md`
+- Work items now stored in `.agents/work/<slug>/` directories
+
+**Migration from old structure:**
+1. For each item in `.agents/todos/todo.md`:
+   - Create `.agents/work/<slug>/` directory
+   - Create `definition.md` with item description
+   - If `.agents/research/<slug>.md` exists, move to `.agents/work/<slug>/research.md`
+   - If `.agents/plans/<slug>-*.md` exists, move to `.agents/work/<slug>/<phase>-plan.md`
+2. Populate queue files:
+   - Items in "In Progress" → `.agents/work/queued.md` under "## In Progress"
+   - Items in "Up Next" → `.agents/work/queued.md` under "## Up Next"
+3. Remove `workUntil` field from workflow.json (replaced by queue)
+4. Archive old directories (keep for reference but stop using)
+
+**New commands:**
+- `/backlog` - Add work items interactively
+- `/queue-add` - Move from backlog to queue
+- `/queue-status` - Show queue state
+
+**Removed:**
+- `/work-until` command (replaced by queue system)
 
 #### Future migrations
 Document here as versions are released.
@@ -289,13 +316,12 @@ Templates are in `superagents/.template/`. Copy these during setup:
 | `.template/workflow.json` | `.agents/workflow.json` |
 | `.template/ROADMAP.md` | `.agents/ROADMAP.md` |
 | `.template/context/*.md` | `.agents/context/*.md` |
-| `.template/todos/todo.md` | `.agents/todos/todo.md` |
-| `.template/archive/done.md` | `.agents/archive/done.md` |
+| `.template/work/backlog.md` | `.agents/work/backlog.md` |
+| `.template/work/queued.md` | `.agents/work/queued.md` |
+| `.template/work/completed.md` | `.agents/work/completed.md` |
+| `.template/work/index.md` | `.agents/work/index.md` |
 | `.template/patterns/index.md` | `.agents/patterns/index.md` |
 | `.template/mistakes/index.md` | `.agents/mistakes/index.md` |
-| `.template/research/index.md` | `.agents/research/index.md` |
-| `.template/plans/index.md` | `.agents/plans/index.md` |
-| `.template/work/index.md` | `.agents/work/index.md` |
 | `.template/spec/README.md` | `spec/README.md` |
 | `.template/spec/index.md` | `spec/index.md` |
 | `.template/architecture/README.md` | `architecture/README.md` |

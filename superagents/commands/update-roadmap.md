@@ -1,14 +1,15 @@
 ---
-description: Regenerate roadmap and todos from specification files in spec/
+description: Regenerate roadmap and backlog from specification files in spec/
 ---
 
 # /update-roadmap Command
 
-Regenerate roadmap and todos from specification files.
+Regenerate roadmap and populate backlog from specification files.
 
 ## Process
 
 ### 1. Analyze Specifications
+
 Use `spec-analyzer` agent (in parallel if multiple files):
 - Read all files in `spec/` directory
 - Extract requirements (functional, non-functional)
@@ -16,46 +17,76 @@ Use `spec-analyzer` agent (in parallel if multiple files):
 - Note constraints and dependencies
 
 ### 2. Generate Roadmap
+
 Use `roadmap-updater` agent to:
 - Group requirements into features
-- Break features into work items (1-2 day chunks)
+- Break features into work items (right-sized for 1-5 tests each)
 - Prioritize by dependencies and value
 - Create phased roadmap
 
 ### 3. Update Files
 
-Save to `.agents/ROADMAP.md`:
+#### Save to `.agents/ROADMAP.md`:
 ```markdown
 # Project Roadmap
 
 ## Phase 1: Foundation
-- [ ] Database setup
-- [ ] API framework
-- [ ] Authentication
+- [ ] database-setup
+- [ ] api-framework
+- [ ] authentication
 
 ## Phase 2: Core Features
-- [ ] User management
-- [ ] Content creation
+- [ ] user-management
+- [ ] content-creation
 ...
 ```
 
-Generate todos in `.agents/todos/todo.md`:
+#### Create work item directories:
+
+For each work item, create `.agents/work/{slug}/definition.md`:
 ```markdown
-# Todo
+# {Work Item Name}
 
-## Current Work Item
-**Name**: database-setup
-**Priority**: Critical
-**Dependencies**: None
-**Requirements**: REQ-001, REQ-002
+## Priority
+{high|medium|low}
 
-### Description
-Set up PostgreSQL database with Drizzle ORM...
+## Description
+{Brief description of the work item}
 
-### Acceptance Criteria
-- [ ] Database connection established
-- [ ] Schema migrations working
-- [ ] Basic CRUD operations tested
+## Requirements
+- REQ-001: {requirement}
+- REQ-002: {requirement}
+
+## Acceptance Criteria
+- [ ] {criterion 1}
+- [ ] {criterion 2}
+
+## Dependencies
+- {dependency if any}
+
+## Created
+{timestamp}
+```
+
+#### Populate `.agents/work/backlog.md`:
+```markdown
+# Backlog
+
+Work items waiting to be queued, in priority order.
+
+## High Priority
+
+- **database-setup** -- Set up database with migrations
+- **api-framework** -- Initialize API framework
+
+## Medium Priority
+
+- **user-management** -- User CRUD operations
+- **content-creation** -- Content management features
+
+## Low Priority
+
+- **analytics-dashboard** -- Usage metrics visualization
 ```
 
 ## Output
@@ -69,11 +100,18 @@ Generating roadmap...
 ✓ Identified 8 features
 ✓ Created 15 work items
 
+Creating work item definitions...
+✓ Created 15 work item directories
+✓ Created definition.md for each
+
 Files updated:
 - .agents/ROADMAP.md (roadmap overview)
-- .agents/todos/todo.md (next work item)
+- .agents/work/backlog.md (prioritized backlog)
+- .agents/work/{slug}/definition.md (15 items)
 
-Next: Run /work to start implementation
+Next steps:
+1. Run /queue-add to move items from backlog to queue
+2. Run /work to start implementation
 ```
 
 ## When to Use
@@ -85,6 +123,10 @@ Next: Run /work to start implementation
 
 ## Integration
 
-- Roadmap feeds into `/work` command
-- Todos drive the RPI workflow
-- Architecture docs reference roadmap items
+- Roadmap provides project overview
+- Backlog feeds into `/queue-add` command
+- Work item definitions drive the RPI workflow
+
+## Note
+
+Existing work in progress is preserved. Only new items are added to the backlog. Items already in the queue or completed are not affected.

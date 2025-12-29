@@ -1,233 +1,164 @@
 ---
 name: archive-work
-description: Archive completed work items by removing from active files and moving to archive
+description: Archive completed work items by moving work directory to archive
 ---
 
 # Archive Work Agent
 
-Remove completed work items from active files and move to archive to minimize context usage.
+Move completed work items from active work directory to archive.
 
 ## Purpose
 
 When a work item completes all RPI phases, this agent:
-1. **Removes** the item from active todo lists (not just marks complete)
-2. **Moves** all artifacts (research, plans, work state) to archive directories
-3. **Updates** index files to reflect the move
-4. **Creates** an entry in done.md with summary and links
+1. **Moves** the work directory (`.agents/work/{slug}/`) to archive (`.agents/archive/{slug}/`)
+2. **Updates** completed.md with the work item entry
+3. **Creates** an entry in `.agents/archive/index.md`
 
-## Goal: Minimize Active Context
+## Goal: Keep Active Work Directory Lean
 
-The primary goal is to keep active files lean so that:
-- Reading `todo.md` only shows pending/in-progress work
-- Reading `ROADMAP.md` only shows uncompleted phases
-- `.agents/research/` only contains active research
-- `.agents/plans/` only contains active plans
-- Context window usage is minimized when checking "what's next"
+The primary goal is to keep the active work directory focused:
+- `.agents/work/queued.md` only shows pending work
+- `.agents/work/{slug}/` directories only exist for active items
+- Completed work is preserved in `.agents/archive/`
 
 ## Input
 
-- `workItem` (required): Name/slug of completed work item
+- `slug` (required): Slug of completed work item
 - `commits` (optional): Array of commit hashes from the work
 - `summary` (optional): Brief summary of what was implemented
-- `requirements` (optional): Array of requirement IDs addressed (REQ-XXX)
 
 ## Output
 
 Returns object with:
-- `archivedTo` - Path to entry in done.md
-- `filesMoved` - Array of files moved to archive
-- `filesUpdated` - Array of files that were updated (todo.md, ROADMAP.md, etc.)
+- `archivedTo` - Path to archived directory
 - `success` - Boolean indicating success
 
 ## Process
 
-### 1. Remove from todo.md
+### 1. Move Work Directory to Archive
 
-Parse `.agents/todos/todo.md` and remove the work item entirely:
+Move the entire work item directory:
 
-**Before:**
-```markdown
-## In Progress
-
-- [x] **auth-system** - User authentication
-  - Requirements: REQ-001, REQ-002
-
-## Up Next
-
-- [ ] **user-profile** - User profile management
+```
+.agents/work/{slug}/ → .agents/archive/{slug}/
 ```
 
-**After:**
-```markdown
-## In Progress
+This directory contains all artifacts:
+- `definition.md` - Original work item description
+- `research.md` - Master research
+- `red-research.md`, `red-plan.md` - RED phase artifacts
+- `green-research.md`, `green-plan.md` - GREEN phase artifacts
+- `refactor-research.md`, `refactor-plan.md` - REFACTOR phase artifacts
+- `report.md` - Combined results report
 
-_No work in progress. Run `/work` to start the next item._
+### 2. Update Archive Index
 
-## Up Next
-
-- [ ] **user-profile** - User profile management
-```
-
-The completed item is **removed**, not moved to a "Completed" section.
-
-### 2. Update ROADMAP.md
-
-Remove completed item from roadmap phases:
-
-**Before:**
-```markdown
-## Phase 1: Foundation
-
-- [x] auth-system - User authentication ✓
-- [ ] user-profile - User profile management
-```
-
-**After:**
-```markdown
-## Phase 1: Foundation
-
-- [ ] user-profile - User profile management
-```
-
-Or if phase is now empty, mark it complete:
-```markdown
-## Phase 1: Foundation ✓
-
-_All items completed. See `.agents/archive/done.md` for details._
-```
-
-### 3. Move Artifacts to Archive
-
-Move files from active directories to archive:
-
-| From | To |
-|------|-----|
-| `.agents/research/{slug}.md` | `.agents/archive/research/{slug}.md` |
-| `.agents/plans/{slug}-red.md` | `.agents/archive/plans/{slug}-red.md` |
-| `.agents/plans/{slug}-green.md` | `.agents/archive/plans/{slug}-green.md` |
-| `.agents/plans/{slug}-refactor.md` | `.agents/archive/plans/{slug}-refactor.md` |
-| `.agents/work/{slug}/` | `.agents/archive/work/{slug}/` |
-| `.agents/plans/diagrams/{slug}-*` | `.agents/archive/plans/diagrams/{slug}-*` |
-
-### 4. Update Index Files
-
-**Remove from active indices:**
-- `.agents/research/index.md` - Remove entry
-- `.agents/plans/index.md` - Remove entries
-
-**Add to archive indices:**
-- `.agents/archive/research/index.md` - Add entry
-- `.agents/archive/plans/index.md` - Add entries
-- `.agents/archive/work/index.md` - Add entry
-
-### 5. Create Entry in done.md
-
-Append to `.agents/archive/done.md`:
+Add entry to `.agents/archive/index.md`:
 
 ```markdown
-### auth-system
+## {slug}
 
-**Completed**: 2025-01-15
-**Description**: User authentication with JWT tokens and session management
-
-**Requirements**: REQ-001, REQ-002, REQ-003
-**Commits**:
-- `abc1234` - test(auth): add authentication tests
-- `def5678` - feat(auth): implement login and logout
-- `ghi9012` - refactor(auth): extract validation utilities
-- `jkl3456` - docs(auth): update architecture
-
-**Artifacts**:
-- Research: [research/auth-system.md](research/auth-system.md)
-- Plans: [plans/auth-system-red.md](plans/auth-system-red.md), [plans/auth-system-green.md](plans/auth-system-green.md)
-- Work: [work/auth-system/](work/auth-system/)
-
-**Summary**: Implemented complete authentication flow including registration, login, logout, and JWT token refresh. Added rate limiting and session expiry.
+**Completed**: {date}
+**Summary**: {summary or from report.md}
+**Commits**: {commit hashes}
+**Location**: [./{slug}/](./{slug}/)
 
 ---
 ```
 
-### 6. Update Workflow State
+### 3. Update completed.md
 
-Update `.agents/workflow.json`:
-- Remove item from any tracking
-- Clear `currentWorkItem` if it matches
-- Clear `currentPhase`
-- Item is NOT added to `completedItems` (that list is deprecated, use done.md)
+The work agent handles moving from queued.md to completed.md before calling archive-work. This agent just ensures the archive is updated.
 
-```json
-{
-  "currentPhase": null,
-  "currentWorkItem": null,
-  "lastUpdated": "2025-01-15T10:30:00Z"
-}
+Verify entry exists in `.agents/work/completed.md`:
+```markdown
+## Done
+
+- **{slug}** -- {description} (completed: {date})
 ```
 
 ## File Operations
 
-### Atomic Updates
+### Directory Move
 
-Perform all file operations atomically:
-1. Read all files to update
-2. Prepare all changes in memory
-3. Write all changes
-4. Verify success
+Move entire directory preserving structure:
+```bash
+mv .agents/work/{slug}/ .agents/archive/{slug}/
+```
 
-### Rollback on Failure
+### Verification
 
-If any operation fails:
-1. Report which operation failed
-2. Do not leave files in inconsistent state
-3. Suggest manual recovery steps
+After move, verify:
+1. Source directory no longer exists
+2. Target directory exists with all files
+3. Archive index updated
+4. completed.md has entry
 
 ## Example Output
 
 ```json
 {
-  "archivedTo": ".agents/archive/done.md",
+  "archivedTo": ".agents/archive/auth-system/",
   "filesMoved": [
-    ".agents/research/auth-system.md -> .agents/archive/research/auth-system.md",
-    ".agents/plans/auth-system-red.md -> .agents/archive/plans/auth-system-red.md",
-    ".agents/plans/auth-system-green.md -> .agents/archive/plans/auth-system-green.md",
-    ".agents/plans/auth-system-refactor.md -> .agents/archive/plans/auth-system-refactor.md",
-    ".agents/work/auth-system/ -> .agents/archive/work/auth-system/"
-  ],
-  "filesUpdated": [
-    ".agents/todos/todo.md (removed item)",
-    ".agents/ROADMAP.md (removed item)",
-    ".agents/research/index.md (removed entry)",
-    ".agents/plans/index.md (removed entries)",
-    ".agents/archive/done.md (added entry)",
-    ".agents/archive/research/index.md (added entry)",
-    ".agents/archive/plans/index.md (added entries)",
-    ".agents/workflow.json (cleared current work)"
+    "definition.md",
+    "research.md",
+    "red-research.md",
+    "red-plan.md",
+    "green-research.md",
+    "green-plan.md",
+    "refactor-research.md",
+    "refactor-plan.md",
+    "report.md"
   ],
   "success": true
 }
 ```
 
-## Quality Criteria
+## Error Handling
 
-1. **Complete Removal** - No traces of completed work in active files
-2. **Proper Archiving** - All artifacts preserved in archive
-3. **Index Consistency** - All index files updated correctly
-4. **Linked References** - done.md entries link to archived artifacts
-5. **Atomic Operation** - Either fully succeeds or fully fails
+If move fails:
+1. Report specific error
+2. Leave files in original location
+3. Suggest manual recovery
+
+```json
+{
+  "success": false,
+  "error": "Failed to move directory",
+  "details": "Permission denied",
+  "recovery": "Manually move .agents/work/{slug}/ to .agents/archive/{slug}/"
+}
+```
+
+## Archive Structure
+
+```
+.agents/archive/
+├── index.md              # List of all archived work items
+├── auth-system/          # Archived work item
+│   ├── definition.md
+│   ├── research.md
+│   ├── red-research.md
+│   ├── red-plan.md
+│   ├── green-research.md
+│   ├── green-plan.md
+│   ├── refactor-research.md
+│   ├── refactor-plan.md
+│   └── report.md
+├── user-profile/         # Another archived work item
+│   └── ...
+└── ...
+```
 
 ## Integration
 
 This agent is called:
 - At the end of `/work` command after ARCHITECTURE phase
-- After `update-architecture` agent completes successfully
-- The final step before starting the next work item
+- After `architecture` agent completes successfully
+- Before the work agent updates queued.md/completed.md
 
-## Context Reduction Impact
+## Token Budget
 
-After archiving:
-- `todo.md` - Only shows pending/in-progress (no completed history)
-- `ROADMAP.md` - Only shows remaining work
-- `.agents/research/` - Only contains active research
-- `.agents/plans/` - Only contains active plans
-- `.agents/work/` - Only contains active work state
-
-To view completed work history, read `.agents/archive/done.md`.
+- Input: ~1k tokens (slug + optional data)
+- Output: ~500 tokens (result summary)
+- File operations are simple moves, not content generation

@@ -162,7 +162,7 @@ const sessionStart = async (payload: SessionStartPayload): Promise<SessionStartR
     decision: 'approve',
     hookSpecificOutput: {
       hookEventName: 'SessionStart',
-      additionalContext: `Superagents RPI workflow active. Commands: /work, /work-until, /update-roadmap, /project-status, /fix-tests`,
+      additionalContext: `Superagents RPI workflow active. Commands: /work, /backlog, /queue-add, /queue-status, /update-roadmap, /project-status, /fix-tests`,
     },
   }
 }
@@ -186,13 +186,20 @@ interface WorkflowState {
   }
 }
 
-// Todo file parsing
-// Note: No 'completed' status - completed items are archived to .agents/archive/done.md
-interface TodoItem {
+// Queue file parsing
+// Items in queued.md - either in progress or up next
+interface QueuedItem {
   slug: string
   status: 'in-progress' | 'up-next'
   description: string
   section: 'In Progress' | 'Up Next'
+}
+
+// Backlog item from backlog.md
+interface BacklogItem {
+  slug: string
+  priority: 'high' | 'medium' | 'low'
+  description: string
 }
 
 // Helper to read workflow.json
@@ -226,17 +233,17 @@ function writeWorkflowState(cwd: string, state: WorkflowState): boolean {
   }
 }
 
-// Helper to parse todo.md and extract work items
-function parseTodoFile(cwd: string): TodoItem[] {
+// Helper to parse queued.md and extract work items
+function parseQueuedFile(cwd: string): QueuedItem[] {
   try {
-    const todoPath = path.join(cwd, '.agents', 'todos', 'todo.md')
-    if (!fs.existsSync(todoPath)) {
+    const queuedPath = path.join(cwd, '.agents', 'work', 'queued.md')
+    if (!fs.existsSync(queuedPath)) {
       return []
     }
-    const content = fs.readFileSync(todoPath, 'utf-8')
-    const items: TodoItem[] = []
+    const content = fs.readFileSync(queuedPath, 'utf-8')
+    const items: QueuedItem[] = []
 
-    // Only parse active sections - completed items are archived to .agents/archive/done.md
+    // Parse In Progress and Up Next sections
     const sections: Array<{name: 'In Progress' | 'Up Next', prefix: 'in-progress' | 'up-next'}> = [
       {name: 'In Progress', prefix: 'in-progress'},
       {name: 'Up Next', prefix: 'up-next'},
@@ -250,7 +257,47 @@ function parseTodoFile(cwd: string): TodoItem[] {
 
       const sectionContent = match[1]
 
-      // Extract work items (format: - [ ] **slug** - description or - [x] **slug** - description)
+      // Extract work items (format: - **slug** -- description)
+      const itemRegex = /-\s*\*\*([^*]+)\*\*\s*--?\s*(.+?)(?=\n|$)/gi
+      let itemMatch
+      while ((itemMatch = itemRegex.exec(sectionContent)) !== null) {
+        items.push({
+          slug: itemMatch[1].trim(),
+          status: section.prefix,
+          description: itemMatch[2].trim(),
+          section: section.name,
+        })
+      }
+    }
+
+    return items
+  } catch (error) {
+    log('Error parsing queued.md:', error)
+    return []
+  }
+}
+
+// Legacy support: parse old todo.md format (for migration)
+function parseTodoFile(cwd: string): QueuedItem[] {
+  try {
+    const todoPath = path.join(cwd, '.agents', 'todos', 'todo.md')
+    if (!fs.existsSync(todoPath)) {
+      return []
+    }
+    const content = fs.readFileSync(todoPath, 'utf-8')
+    const items: QueuedItem[] = []
+
+    const sections: Array<{name: 'In Progress' | 'Up Next', prefix: 'in-progress' | 'up-next'}> = [
+      {name: 'In Progress', prefix: 'in-progress'},
+      {name: 'Up Next', prefix: 'up-next'},
+    ]
+
+    for (const section of sections) {
+      const sectionRegex = new RegExp(`##\\s*${section.name}\\s*([\\s\\S]*?)(?=##|$)`, 'i')
+      const match = content.match(sectionRegex)
+      if (!match) continue
+
+      const sectionContent = match[1]
       const itemRegex = /-?\s*\[[ x]\]\s*\*\*([^*]+)\*\*\s*-?\s*(.+?)(?=\n|$)/gi
       let itemMatch
       while ((itemMatch = itemRegex.exec(sectionContent)) !== null) {
@@ -270,11 +317,30 @@ function parseTodoFile(cwd: string): TodoItem[] {
   }
 }
 
-// Helper to get the current work item from todo file
-function getCurrentWorkItemFromTodo(cwd: string): string | null {
-  const items = parseTodoFile(cwd)
+// Helper to get the current work item from queue file
+function getCurrentWorkItemFromQueue(cwd: string): string | null {
+  // Try new queued.md first
+  let items = parseQueuedFile(cwd)
+  if (items.length === 0) {
+    // Fallback to legacy todo.md
+    items = parseTodoFile(cwd)
+  }
   const inProgress = items.find(i => i.status === 'in-progress')
   return inProgress?.slug || null
+}
+
+// Helper to check if there are pending items in the queue
+function hasQueuedItems(cwd: string): { hasPending: boolean; count: number; items: string[] } {
+  let items = parseQueuedFile(cwd)
+  if (items.length === 0) {
+    items = parseTodoFile(cwd)
+  }
+  const upNext = items.filter(i => i.status === 'up-next')
+  return {
+    hasPending: upNext.length > 0,
+    count: upNext.length,
+    items: upNext.map(i => i.slug),
+  }
 }
 
 // Helper to check if a work item is archived (completed)
@@ -294,14 +360,11 @@ function isWorkItemArchived(cwd: string, slug: string): boolean {
   }
 }
 
-// Helper to update workflow state from todo file
-// Note: Completed items are NOT tracked here - they're archived to .agents/archive/done.md
-function syncWorkflowFromTodo(cwd: string, workflow: WorkflowState): void {
-  const items = parseTodoFile(cwd)
-
+// Helper to update workflow state from queue file
+function syncWorkflowFromQueue(cwd: string, workflow: WorkflowState): void {
   // Update current work item if not set
   if (!workflow.currentWorkItem) {
-    const currentSlug = getCurrentWorkItemFromTodo(cwd)
+    const currentSlug = getCurrentWorkItemFromQueue(cwd)
     if (currentSlug) {
       workflow.currentWorkItem = currentSlug
       workflow.workItemStartedAt = new Date().toISOString()
@@ -311,7 +374,7 @@ function syncWorkflowFromTodo(cwd: string, workflow: WorkflowState): void {
   workflow.lastUpdated = new Date().toISOString()
 }
 
-// Stop handler - check if work should continue
+// Stop handler - check if work queue has pending items
 const stop = async (payload: StopPayload): Promise<StopResponse> => {
   const { session_id, transcript_path } = payload
 
@@ -320,7 +383,7 @@ const stop = async (payload: StopPayload): Promise<StopResponse> => {
 
   let workflow = readWorkflowState(cwd)
 
-  // If no workflow state, create it and sync from todo
+  // If no workflow state, create it and sync from queue
   if (!workflow) {
     workflow = {
       version: '1.0.0',
@@ -333,45 +396,35 @@ const stop = async (payload: StopPayload): Promise<StopResponse> => {
     }
   }
 
-  // Always sync from todo file to get latest state
-  syncWorkflowFromTodo(cwd, workflow)
+  // Always sync from queue file to get latest state
+  syncWorkflowFromQueue(cwd, workflow)
 
   // Write updated state
   writeWorkflowState(cwd, workflow)
 
-  // If no workUntil set, allow stop
-  if (!workflow.workUntil) {
-    return {}
-  }
-
-  const { workUntil, currentWorkItem } = workflow
-
-  // Check if the target work item is archived (completed)
-  const targetCompleted = isWorkItemArchived(cwd, workUntil)
-
-  // Check if current work item matches the target
-  const isCurrentTarget = currentWorkItem === workUntil
+  // Check if there are items in the queue
+  const queueStatus = hasQueuedItems(cwd)
+  const { currentWorkItem, currentPhase } = workflow
 
   // Allow stop if:
-  // 1. Target work item is completed, OR
-  // 2. We're not currently working on anything (idle state)
-  if (targetCompleted || (!currentWorkItem && !isCurrentTarget)) {
-    // Clear workUntil if target is reached
-    if (targetCompleted) {
-      workflow.workUntil = undefined
-      writeWorkflowState(cwd, workflow)
-    }
+  // 1. No items in "Up Next" queue AND no work in progress
+  if (!queueStatus.hasPending && !currentWorkItem) {
     return {}
   }
 
-  // Block the stop - work should continue
-  let reason = `Work until '${workUntil}' is active.`
+  // Block the stop - there are queued items to process
+  let reason = ''
 
   if (currentWorkItem) {
-    reason += ` Currently working on: ${currentWorkItem} (phase: ${workflow.currentPhase || 'unknown'}). Run /work to continue.`
-  } else {
-    reason += ` Run /work to continue.`
+    reason = `Work in progress: ${currentWorkItem} (phase: ${currentPhase || 'unknown'}).`
   }
+
+  if (queueStatus.hasPending) {
+    if (reason) reason += ' '
+    reason += `${queueStatus.count} item${queueStatus.count > 1 ? 's' : ''} remaining in queue: ${queueStatus.items.slice(0, 3).join(', ')}${queueStatus.count > 3 ? '...' : ''}.`
+  }
+
+  reason += ' Run /work to continue processing.'
 
   return {
     decision: 'block',
@@ -451,11 +504,11 @@ const subagentStop = async (payload: SubagentStopPayload): Promise<SubagentStopR
   // Extract cwd from transcript_path
   const cwd = path.dirname(path.dirname(transcript_path))
 
-  // Sync workflow state from todo file when an agent stops
+  // Sync workflow state from queue file when an agent stops
   // This ensures we catch any changes made by agents
   const workflow = readWorkflowState(cwd)
   if (workflow) {
-    syncWorkflowFromTodo(cwd, workflow)
+    syncWorkflowFromQueue(cwd, workflow)
     writeWorkflowState(cwd, workflow)
   }
 
