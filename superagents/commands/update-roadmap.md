@@ -19,10 +19,12 @@ Use `spec-analyzer` agent (in parallel if multiple files):
 ### 2. Generate Roadmap
 
 Use `roadmap-updater` agent to:
-- Group requirements into features
-- Break features into work items (right-sized for 1-5 tests each)
-- Prioritize by dependencies and value
-- Create phased roadmap
+- Break features into **vertical slices** (backend + integration + UI per feature)
+- Prioritize for **early user visibility** (not all backend first, then all frontend)
+- Size work items for 1-5 tests each
+- Create phased roadmap where each phase = user-visible progress
+
+**Ordering principle**: `backend_a → frontend_a → backend_b → frontend_b` so users see incremental progress, not `backend_a → backend_b → frontend_a → frontend_b`.
 
 ### 3. Update Files
 
