@@ -28,8 +28,15 @@ Parse `.agents/work/backlog.md` to get all items.
 - If no match: show error
 
 **If no argument:**
-- List all backlog items by priority
-- Prompt user to select
+Use `AskUserQuestion` to prompt:
+
+**Question**: "Which item do you want to add to the queue?"
+**Options**:
+1. **Next highest priority** - Add `{slug}` ({description}) - shows the actual next item
+2. **Choose specific item** - Enter name, slug, or number
+
+If user selects "Next highest priority": add that item directly.
+If user selects "Choose specific item": list all backlog items numbered, then prompt for input.
 
 ### 3. Move Item
 
