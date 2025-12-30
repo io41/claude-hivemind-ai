@@ -14,14 +14,11 @@ Hivemind AI provides modular, composable plugins that enhance Claude Code with s
 ## Installation
 
 ```bash
-# In Claude Code, add the marketplace
-/plugin marketplace add path/to/hivemind-ai
+# Add marketplace
+claude plugin marketplace add git@github.com:hivemind-ai-core/claude-hivemind-ai.git
 
-# Or from a Git repository
-/plugin marketplace add github.com/hivemind-ai/hivemind-ai
-
-# Install a plugin
-/plugin install superagents@hivemind-ai
+# Install plugin
+claude plugin install superagents@hivemind-ai
 ```
 
 ## Available Plugins
