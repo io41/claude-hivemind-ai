@@ -34,6 +34,7 @@ Read `.agents/work/{slug}/research.md` (master research from work-research agent
 - Check existing test patterns in codebase
 - Load `.agents/context/phase-red.md`
 - Load `.agents/context/testing.md`
+- **If exists**: Read `.agents/work/{slug}/red-kickback.md` (previous validation failures)
 
 **GREEN Phase**:
 - Read `report.md` for RED phase results (test expectations)
@@ -56,6 +57,11 @@ Write phase-specific research to `.agents/work/{slug}/{phase}-research.md`:
 
 ## Master Research Summary
 {key points from research.md}
+
+## Previous Validation Failures (if red-kickback.md exists)
+IMPORTANT: Previous tests were rejected. Read carefully and avoid same mistakes:
+- {test that was wrong}: {why it was wrong}
+- Correct interpretation: {what the spec actually says}
 
 ## Existing Test Patterns
 - Test framework: {vitest/bun/cargo}

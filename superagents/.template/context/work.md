@@ -8,12 +8,15 @@ Read this file when running `/work`. Follow it exactly. Do not ask the user.
 
 Each work item requires ALL phases to complete:
 ```
-Get Item → Research → RED → GREEN → REFACTOR → Architecture → Archive → Check for More
+Get Item → Research → RED → GREEN-VALIDATE → GREEN → REFACTOR → Architecture → Archive → Check for More
+                        ↑                |
+                        └── kickback ────┘ (if tests invalid, max 3 retries)
 ```
 
 Only stop when:
-- An error occurs (gate fails, agent errors)
+- A fatal error occurs (gate fails, agent errors)
 - Queue is empty (step 8 finds no more items)
+- Kickback retry limit reached (3 attempts)
 
 ## Minimal Context Rule
 
@@ -94,7 +97,56 @@ Task(superagents:rpi-plan, "{slug} phase=green")
   Reads: green-research.md
   Writes: green-plan.md
   MUST include integration point
+```
 
+#### 4.1 Test Validation (Pre-Implementation)
+
+Before implementing, validate that tests are correct:
+
+```
+Task(superagents:verify-results, "phase=green-validate workItem={slug}")
+  Reads: research.md, spec/, test files, report.md
+  Returns: { testsValid, testsAnalyzed, validationErrors[] }
+```
+
+**If `testsValid === true`:** Proceed to step 4.2 (Implementation).
+
+**If `testsValid === false`:** The tests are wrong, not the implementation.
+
+```
+KICKBACK TO RED:
+1. Write validationErrors to .agents/work/{slug}/red-kickback.md:
+   ```markdown
+   # RED Kickback: {slug}
+
+   Tests were rejected during GREEN validation. Fix these issues:
+
+   ## Validation Errors
+
+   ### {testFile}: {testName}
+   - **Issue**: {issue}
+   - **Spec Reference**: {specReference}
+   - **Correct Behavior**: {correctBehavior}
+
+   (repeat for each error)
+   ```
+
+2. Revert RED phase commit:
+   git revert HEAD --no-edit
+
+3. Increment redRetryCount (track in memory, reset per work item)
+
+4. If redRetryCount >= 3:
+   STOP - Escalate to human: "Requirements may be ambiguous or fundamentally misunderstood after 3 attempts"
+
+5. Go to step 3 (RED phase):
+   - rpi-research reads red-kickback.md
+   - Tests will be rewritten with corrected understanding
+```
+
+#### 4.2 Implementation (Only if tests valid)
+
+```
 Task(superagents:rpi-implement, "{slug} phase=green")
   Reads: green-plan.md
   Writes: source files, report.md
@@ -186,7 +238,15 @@ If empty: Report "Queue empty. All work complete."
 
 ## Error Handling
 
-If any agent fails or gate doesn't pass:
+### Recoverable: Test Validation Kickback
+If `testsValid === false` in GREEN-VALIDATE:
+- This is NOT an error - it's iterative improvement
+- Write `red-kickback.md`, revert RED commit, loop to step 3
+- Continue automatically (do not stop)
+- Only stop if `redRetryCount >= 3` (escalate to human)
+
+### Fatal: Agent Failure or Gate Failure
+If any agent fails or gate doesn't pass (except kickback):
 1. Keep item in "## In Progress"
 2. STOP (do not continue)
 3. Report error
@@ -196,6 +256,7 @@ If any agent fails or gate doesn't pass:
 
 Only track:
 - `{slug}` - current work item slug
+- `redRetryCount` - number of RED kickbacks for current item (reset to 0 for each new item)
 - Agent return values (minimal summaries)
 
 Everything else is in files. Don't accumulate agent internals.

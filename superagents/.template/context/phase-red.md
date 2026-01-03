@@ -6,9 +6,22 @@ Write failing tests that define expected behavior.
 
 ### Read Before Starting
 - `.agents/work/{slug}/research.md` - Research findings
+- `.agents/work/{slug}/red-kickback.md` - **If exists**: Previous validation failures
 
 ### Write Before Executing
 - `.agents/work/{slug}/red-plan.md` - Test plan
+
+## Handling Kickbacks from GREEN
+
+If `red-kickback.md` exists, previous tests were **rejected** because they didn't match the spec.
+
+**READ THIS FILE CAREFULLY.** It contains:
+- Which tests were wrong
+- Why they were wrong (incorrect assertions, misunderstood requirements)
+- References to spec docs that were misinterpreted
+- What the correct behavior should be
+
+This is your chance to fix the test design. Don't make the same mistakes.
 
 ## Gate: Entry
 

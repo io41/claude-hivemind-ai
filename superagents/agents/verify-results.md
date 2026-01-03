@@ -17,8 +17,9 @@ Verify that phase requirements are met before allowing commits.
 
 ## Input
 
-- `phase` - Current phase (red, green, refactor)
+- `phase` - Current phase (red, green, green-validate, refactor)
 - `testCommand` - Command to run tests (default: `bun test`)
+- `workItem` - Work item slug (for reading research/spec context)
 
 ## Output
 
@@ -32,6 +33,8 @@ Returns object with:
 - `typeErrors` - Array of TypeScript errors (if any)
 - `integrationVerified` - Boolean: true if new code is reachable from application
 - `integrationIssues` - Array of unreachable code paths (if any)
+- `testsValid` - Boolean: true if tests correctly reflect requirements (green-validate only)
+- `validationErrors` - Array of test validation issues (green-validate only)
 
 ## Gate Requirements
 
@@ -43,7 +46,26 @@ canProceed = true when:
   - Failures are assertion failures (not syntax/import errors)
 ```
 
-### GREEN Phase Gate
+### GREEN-VALIDATE Phase Gate (Pre-Implementation)
+```
+testsValid = true when:
+  - All test assertions match spec requirements
+  - Expected values align with documented behavior
+  - API contracts (signatures, return types) are correct
+  - No logical contradictions in test expectations
+
+testsValid = false when:
+  - Test expects wrong value (misread spec)
+  - Test expects impossible behavior
+  - Test contradicts another test
+  - Test uses wrong API signature
+
+canProceed = testsValid
+```
+
+**This gate runs BEFORE implementation. Invalid tests trigger kickback to RED.**
+
+### GREEN Phase Gate (Post-Implementation)
 ```
 canProceed = true when:
   - passRate === 100
@@ -62,6 +84,49 @@ canProceed = true when:
 ```
 
 ## Process
+
+### For GREEN-VALIDATE Phase
+
+1. **Read Context**
+   - Read `.agents/work/{slug}/research.md` for requirements
+   - Read `spec/` files referenced in research
+   - Read `.agents/work/{slug}/red-kickback.md` if exists (previous failures)
+   - Read `.agents/work/{slug}/report.md` for list of test files created
+
+2. **Read Tests**
+   - Get test files from `report.md` (RED phase output lists files created)
+   - Or use `git diff HEAD~1 --name-only` to find files from last commit
+   - Parse each test file to understand what it expects
+
+3. **Cross-Reference with Spec**
+   For each test assertion:
+   - Find the corresponding requirement in spec
+   - Verify expected values match spec
+   - Check API signatures match documented interface
+   - Flag any contradictions or impossibilities
+
+4. **Generate Validation Report**
+   ```json
+   {
+     "testsValid": true/false,
+     "testsAnalyzed": 5,
+     "validationErrors": [
+       {
+         "testFile": "path/to/test.ts",
+         "testName": "test description",
+         "issue": "what's wrong",
+         "specReference": "where the correct info is",
+         "correctBehavior": "what it should be"
+       }
+     ]
+   }
+   ```
+
+5. **Return Result**
+   - If `testsValid === false`, workflow will kickback to RED
+   - If `testsValid === true`, workflow proceeds to implementation
+
+### For Other Phases
 
 1. **Run Tests**
    ```bash
@@ -144,6 +209,41 @@ integrationVerified === true? → PROCEED TO COMMIT
 ```
 
 ## Example Outputs
+
+### GREEN-VALIDATE Gate - PASS
+```json
+{
+  "canProceed": true,
+  "testsValid": true,
+  "testsAnalyzed": 5,
+  "validationErrors": []
+}
+```
+
+### GREEN-VALIDATE Gate - FAIL (tests incorrect)
+```json
+{
+  "canProceed": false,
+  "testsValid": false,
+  "testsAnalyzed": 5,
+  "validationErrors": [
+    {
+      "testFile": "src/auth/auth.test.ts",
+      "testName": "should hash password with bcrypt",
+      "issue": "Test expects bcrypt but spec requires argon2id",
+      "specReference": "spec/auth.md:42 - 'Passwords MUST be hashed with argon2id'",
+      "correctBehavior": "hashPassword() should use argon2id, not bcrypt"
+    },
+    {
+      "testFile": "src/auth/auth.test.ts",
+      "testName": "should return user with email",
+      "issue": "Test expects email in response but spec says email is private",
+      "specReference": "spec/auth.md:67 - 'User responses MUST NOT include email'",
+      "correctBehavior": "getUser() response should omit email field"
+    }
+  ]
+}
+```
 
 ### GREEN Gate - PASS
 ```json

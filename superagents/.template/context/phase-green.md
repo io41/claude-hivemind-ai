@@ -7,6 +7,7 @@ Implement code to pass all tests. One test at a time.
 ### Read Before Starting
 - `.agents/work/{slug}/research.md` - Research findings
 - `.agents/work/{slug}/red-plan.md` - Test plan (what tests expect)
+- `.agents/work/{slug}/red-kickback.md` - Previous validation failures (if exists)
 
 ### Write Before Executing
 - `.agents/work/{slug}/green-plan.md` - Implementation plan
@@ -23,6 +24,52 @@ Before committing GREEN:
 1. 100% test pass rate
 2. Zero TypeScript errors
 3. Code is integrated (reachable from application)
+
+## Pre-Implementation: Test Validation
+
+**CRITICAL: Validate tests BEFORE writing any implementation code.**
+
+Tests being wrong is a RED phase failure, not a GREEN phase failure. GREEN's job is to identify invalid specifications before wasting effort implementing them.
+
+### What to Validate
+
+For each failing test, verify:
+1. **Assertion correctness** - Does the expected value match requirements?
+2. **Requirement interpretation** - Does the test correctly interpret the spec?
+3. **API contract** - Does the test expect the right function signatures/returns?
+4. **Edge cases** - Are edge case assertions reasonable?
+
+### Validation Failure = Kickback
+
+If tests are invalid, DO NOT try to implement. Instead:
+
+1. Return structured validation error:
+   ```json
+   {
+     "testsValid": false,
+     "validationErrors": [
+       {
+         "testFile": "auth.test.ts",
+         "testName": "should hash password with bcrypt",
+         "issue": "Test expects bcrypt but spec says use argon2",
+         "specReference": "spec/auth.md line 42",
+         "correctBehavior": "Password should be hashed with argon2id"
+       }
+     ]
+   }
+   ```
+
+2. The workflow will:
+   - Write this to `red-kickback.md`
+   - Revert the RED phase commit
+   - Return to RED phase with the feedback
+
+### Why Kickback Instead of Fixing?
+
+- **Separation of concerns**: GREEN implements, RED specifies
+- **No cheating**: GREEN editing tests to make them pass defeats TDD
+- **Clear accountability**: Wrong tests = research/RED problem
+- **Audit trail**: Kickback creates documentation of the iteration
 
 ## Single-Piece Flow
 
