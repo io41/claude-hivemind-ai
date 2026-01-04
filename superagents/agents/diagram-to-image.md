@@ -13,6 +13,12 @@ Convert Mermaid diagram files (.mmd) to images (SVG/PNG) for embedding in docume
 
 Take Mermaid source files and convert them to rendered images using the Mermaid CLI tool. This enables embedding diagrams in markdown documentation that renders in any viewer.
 
+## CRITICAL: No Local Installation
+
+**NEVER run `npm install` or `bun add` to install mermaid-cli locally.**
+
+Always use `npx @mermaid-js/mermaid-cli mmdc` which runs the tool directly without installing it to the project. This is essential to avoid polluting projects (especially non-Node.js projects like Rust, Go, Python) with unwanted `node_modules/` and `package.json` files.
+
 ## Input
 
 - `sourcePath` (required): Path to .mmd file OR directory containing .mmd files

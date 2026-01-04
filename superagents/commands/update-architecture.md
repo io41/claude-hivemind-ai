@@ -57,8 +57,10 @@ Use `diagram-generator` agent to create/update diagrams:
 
 Use `diagram-to-image` agent:
 
+**CRITICAL: Use `npx` only - NEVER run `npm install` or `bun add` to install mermaid-cli locally.** This prevents polluting non-Node.js projects with `node_modules/` and `package.json`.
+
 ```bash
-# Convert all .mmd files to .svg
+# Convert all .mmd files to .svg (using npx - no local installation)
 for f in architecture/diagrams/*.mmd; do
     npx @mermaid-js/mermaid-cli mmdc -i "$f" -o "${f%.mmd}.svg" -t default
 done

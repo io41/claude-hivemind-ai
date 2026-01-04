@@ -195,6 +195,8 @@ Based on spec content, use `diagram-generator` agent:
 
 Use `diagram-to-image` agent:
 
+**CRITICAL: Use `npx` only - NEVER run `npm install` or `bun add` to install mermaid-cli locally.** This prevents polluting non-Node.js projects with `node_modules/` and `package.json`.
+
 ```bash
 for f in spec/diagrams/{slug}-*.mmd; do
     npx @mermaid-js/mermaid-cli mmdc -i "$f" -o "${f%.mmd}.svg" -t default

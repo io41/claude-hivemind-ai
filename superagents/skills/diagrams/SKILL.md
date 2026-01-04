@@ -95,6 +95,8 @@ The system consists of...
 | `diagram-generator` | Analyze code/specs and generate Mermaid diagrams |
 | `diagram-to-image` | Convert .mmd files to SVG images |
 
+**CRITICAL**: When converting diagrams, always use `npx @mermaid-js/mermaid-cli mmdc` - NEVER install mermaid-cli locally with `npm install` or `bun add`. This prevents polluting non-Node.js projects.
+
 ## Best Practices
 
 1. **Keep diagrams focused** - One concept per diagram, split if complex

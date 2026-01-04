@@ -2,6 +2,12 @@
 
 Converting Mermaid diagrams to images using `npx @mermaid-js/mermaid-cli`.
 
+## CRITICAL: No Local Installation
+
+**NEVER run `npm install` or `bun add` to install mermaid-cli locally.**
+
+Always use `npx` which downloads and runs the tool on-demand without creating `node_modules/` or `package.json` files. This is essential for non-Node.js projects (Rust, Go, Python, etc.) where npm dependencies would pollute the codebase.
+
 ## Overview
 
 Mermaid diagrams in `.mmd` files are converted to SVG images for embedding in markdown documentation. This uses the official Mermaid CLI tool via `npx` (no pre-installation required).
