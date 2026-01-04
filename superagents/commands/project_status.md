@@ -2,7 +2,7 @@
 description: Show current workflow state, progress, and test status
 ---
 
-# /project-status Command
+# /superagents:project-status Command
 
 Show current workflow state and progress.
 
@@ -73,7 +73,7 @@ Read `.agents/ROADMAP.md` and `.agents/todos/`:
    - 10:30 Research complete
    - 10:15 Started work item
 
-Next: Continue GREEN phase or run /work to proceed
+Next: Continue GREEN phase or run /superagents:work to proceed
 ```
 
 ## Indicators

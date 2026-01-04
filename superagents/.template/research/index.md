@@ -4,7 +4,7 @@ Research artifacts for work items. Created during RESEARCH phase.
 
 ## Files
 
-_No research artifacts yet. Created automatically during /work._
+_No research artifacts yet. Created automatically during /superagents:work._
 
 ## File Format
 

@@ -1,6 +1,6 @@
 # Project Roadmap
 
-Generated from specifications by `/update-roadmap` command.
+Generated from specifications by `/superagents:update-roadmap` command.
 
 ## Overview
 
@@ -11,8 +11,8 @@ This roadmap is automatically generated from `spec/*.md` files. It organizes req
 ## How to Use
 
 1. Write requirements in `spec/*.md`
-2. Run `/update-roadmap` to generate this roadmap
-3. Run `/work` to implement the next work item
+2. Run `/superagents:update-roadmap` to generate this roadmap
+3. Run `/superagents:work` to implement the next work item
 
 ## Phases
 
@@ -50,7 +50,7 @@ _Generated work items will appear here._
 
 ## Regenerating
 
-Run `/update-roadmap` after:
+Run `/superagents:update-roadmap` after:
 - Adding new specs
 - Modifying existing specs
 - Removing specs

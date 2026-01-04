@@ -39,7 +39,7 @@ archive-work moves .agents/work/{slug}/ → .agents/archive/{slug}/
 
 ## Definition Format
 
-Created by `/backlog` or `/queue-add` commands:
+Created by `/superagents:backlog` or `/superagents:queue-add` commands:
 
 ```markdown
 # Work Item: {slug}

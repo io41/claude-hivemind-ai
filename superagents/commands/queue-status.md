@@ -2,7 +2,7 @@
 description: Show current work queue and processing status
 ---
 
-# /queue-status Command
+# /superagents:queue-status Command
 
 Display the current state of the work queue.
 
@@ -58,8 +58,8 @@ From `workflow.json`:
    - completed-item-2
 
 ─────────────────────────────────────────────────────────────
-Run /work to process the next item in queue.
-Run /queue-add to add items from backlog.
+Run /superagents:work to process the next item in queue.
+Run /superagents:queue-add to add items from backlog.
 ```
 
 ### When Queue is Empty
@@ -76,8 +76,8 @@ Run /queue-add to add items from backlog.
    Medium: {count}
    Low:    {count}
 
-Run /queue-add to move items from backlog to queue.
-Run /backlog to add new work items.
+Run /superagents:queue-add to move items from backlog to queue.
+Run /superagents:backlog to add new work items.
 ```
 
 ## Notes

@@ -1,6 +1,6 @@
 # Work Orchestration
 
-Read this file when running `/work`. Follow it exactly. Do not ask the user.
+Read this file when running `/superagents:work`. Follow it exactly. Do not ask the user.
 
 ## Critical: Execute All Steps Sequentially
 
@@ -250,7 +250,7 @@ If any agent fails or gate doesn't pass (except kickback):
 1. Keep item in "## In Progress"
 2. STOP (do not continue)
 3. Report error
-4. User fixes and re-runs /work
+4. User fixes and re-runs /superagents:work
 
 ## What You Track
 

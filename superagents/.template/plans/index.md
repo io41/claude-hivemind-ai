@@ -4,7 +4,7 @@ Execution plans for each workflow phase. Created before executing each phase.
 
 ## Files
 
-_No plans yet. Created automatically during /work._
+_No plans yet. Created automatically during /superagents:work._
 
 ## File Format
 

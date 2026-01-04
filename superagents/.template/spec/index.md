@@ -44,5 +44,5 @@ Brief description.
 ## Workflow
 
 1. Write specs in this directory
-2. Run `/update-roadmap` to generate work items
-3. Run `/work` to implement
+2. Run `/superagents:update-roadmap` to generate work items
+3. Run `/superagents:work` to implement

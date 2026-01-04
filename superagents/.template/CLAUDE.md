@@ -28,7 +28,7 @@ The `verify-results` agent enforces gates, and `git-commit` handles commits afte
 ## Workflow
 
 ```
-/work → research → RED → GREEN → REFACTOR → architecture → archive
+/superagents:work → research → RED → GREEN → REFACTOR → architecture → archive
                     ↓       ↓         ↓            ↓           ↓
                  tests   one test   one change   docs    move to
                  fail    at a time  at a time   update   archive/
@@ -65,8 +65,8 @@ backlog.md → queued.md → completed.md
   waiting    processing    finished
 ```
 
-- `/queue-add` moves items from backlog to queue
-- `/work` processes items from queue (auto-continues until empty)
+- `/superagents:queue-add` moves items from backlog to queue
+- `/superagents:work` processes items from queue (auto-continues until empty)
 - Completed items archived to `.agents/archive/<slug>/`
 
 ## Workflow Artifacts
@@ -165,13 +165,13 @@ The `git-commit` agent reads this config and acts accordingly. The `archive-work
 
 ## Commands
 
-- `/work` - Execute RPI workflow (continues until queue empty)
-- `/backlog` - Add work items interactively
-- `/queue-add` - Move items from backlog to queue
-- `/queue-status` - Show current queue state
-- `/update-roadmap` - Generate roadmap and backlog from spec
-- `/project-status` - Show current state
-- `/fix-tests` - Systematic test repair
-- `/update-architecture` - Update architecture docs with diagrams
-- `/create-spec` - Interactive spec creation/amendment
-- `/janitor` - Clean up stale files and orphaned work items
+- `/superagents:work` - Execute RPI workflow (continues until queue empty)
+- `/superagents:backlog` - Add work items interactively
+- `/superagents:queue-add` - Move items from backlog to queue
+- `/superagents:queue-status` - Show current queue state
+- `/superagents:update-roadmap` - Generate roadmap and backlog from spec
+- `/superagents:project-status` - Show current state
+- `/superagents:fix-tests` - Systematic test repair
+- `/superagents:update-architecture` - Update architecture docs with diagrams
+- `/superagents:create-spec` - Interactive spec creation/amendment
+- `/superagents:janitor` - Clean up stale files and orphaned work items

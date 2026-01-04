@@ -2,7 +2,7 @@
 description: Update architecture/ directory with current implementation description including Mermaid charts, convert to images, link in markdown
 ---
 
-# /update-architecture Command
+# /superagents:update-architecture Command
 
 Update architecture documentation with Mermaid diagrams reflecting current implementation.
 
@@ -181,7 +181,7 @@ Committed: docs(architecture): update diagrams [abc123]
 
 ## When to Use
 
-- After completing features (via /work)
+- After completing features (via /superagents:work)
 - After major refactoring
 - When architecture changes significantly
 - Before major releases
@@ -192,10 +192,10 @@ Committed: docs(architecture): update diagrams [abc123]
 The command can be invoked with focus areas:
 
 ```
-/update-architecture              # Full update
-/update-architecture --api        # Focus on API documentation
-/update-architecture --database   # Focus on data model
-/update-architecture --feature X  # Focus on specific feature
+/superagents:update-architecture              # Full update
+/superagents:update-architecture --api        # Focus on API documentation
+/superagents:update-architecture --database   # Focus on data model
+/superagents:update-architecture --feature X  # Focus on specific feature
 ```
 
 ## Diagram Selection Logic
@@ -227,6 +227,6 @@ Skip diagram generation when:
 ## Integration
 
 This command:
-- Is called at the end of `/work` workflow (ARCHITECTURE phase)
+- Is called at the end of `/superagents:work` workflow (ARCHITECTURE phase)
 - Can be run standalone for documentation updates
 - Works with `diagram-generator` and `diagram-to-image` agents

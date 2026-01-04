@@ -85,5 +85,5 @@ Allow users to register, login, and logout securely.
 ## After Writing Specs
 
 1. Update `index.md` with new spec files
-2. Run `/update-roadmap` to generate work items
-3. Run `/work` to start implementing
+2. Run `/superagents:update-roadmap` to generate work items
+3. Run `/superagents:work` to start implementing

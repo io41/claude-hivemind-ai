@@ -1,5 +1,5 @@
 ---
-description: "DEPRECATED - Subagents cannot orchestrate. Use /work command instead."
+description: "DEPRECATED - Subagents cannot orchestrate. Use /superagents:work command instead."
 capabilities: ["deprecated"]
 ---
 
@@ -13,7 +13,7 @@ This agent was designed to orchestrate the work queue by spawning phase agents.
 
 ## What To Do Instead
 
-Use the `/work` command, which tells main Claude to:
+Use the `/superagents:work` command, which tells main Claude to:
 1. Read `.agents/context/work.md` for workflow
 2. Spawn fine-grained agents directly:
    - `work-research` - gathers context for work item
@@ -28,6 +28,6 @@ Use the `/work` command, which tells main Claude to:
 
 ## See Also
 
-- `/work` command
+- `/superagents:work` command
 - `.agents/context/work.md` - Full workflow instructions
 - Fine-grained agents for context isolation

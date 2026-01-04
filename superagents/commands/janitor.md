@@ -2,7 +2,7 @@
 description: Scan .agents directories and clean up stale files, orphaned work items, and inconsistencies
 ---
 
-# /janitor Command
+# /superagents:janitor Command
 
 Scan the `.agents` directory structure and identify/fix inconsistencies.
 
@@ -151,7 +151,7 @@ Issues Found: 4
   - 1 unarchived completed item
   - 3 legacy files
 
-Run /janitor --fix to automatically resolve these issues.
+Run /superagents:janitor --fix to automatically resolve these issues.
 ```
 
 ## Fix Mode

@@ -1,6 +1,6 @@
 # Todos Index
 
-Work items to be completed. Generated from roadmap by /update-roadmap.
+Work items to be completed. Generated from roadmap by /superagents:update-roadmap.
 
 ## Files
 

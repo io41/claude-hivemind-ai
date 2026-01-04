@@ -2,7 +2,7 @@
 description: Regenerate roadmap and backlog from specification files in spec/
 ---
 
-# /update-roadmap Command
+# /superagents:update-roadmap Command
 
 Regenerate roadmap and populate backlog from specification files.
 
@@ -116,8 +116,8 @@ Files updated:
 - .agents/work/{slug}/definition.md (15 items)
 
 Next steps:
-1. Run /queue-add to move items from backlog to queue
-2. Run /work to start implementation
+1. Run /superagents:queue-add to move items from backlog to queue
+2. Run /superagents:work to start implementation
 ```
 
 ## When to Use
@@ -130,7 +130,7 @@ Next steps:
 ## Integration
 
 - Roadmap provides project overview
-- Backlog feeds into `/queue-add` command
+- Backlog feeds into `/superagents:queue-add` command
 - Work item definitions drive the RPI workflow
 
 ## Note

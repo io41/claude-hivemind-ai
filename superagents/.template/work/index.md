@@ -33,12 +33,12 @@ work/
 
 ## Workflow
 
-1. Items start in `backlog.md` (from `/update-roadmap` or `/backlog`)
-2. `/queue-add` moves items to `queued.md`
-3. `/work` processes the next item in queue
+1. Items start in `backlog.md` (from `/superagents:update-roadmap` or `/superagents:backlog`)
+2. `/superagents:queue-add` moves items to `queued.md`
+3. `/superagents:work` processes the next item in queue
 4. Completed items move to `completed.md`
 5. Archive agent moves to `.agents/archive/{slug}/`
 
 ## Queue Status
 
-Use `/queue-status` to view current queue state.
+Use `/superagents:queue-status` to view current queue state.

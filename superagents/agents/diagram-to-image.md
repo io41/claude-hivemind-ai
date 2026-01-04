@@ -228,8 +228,8 @@ find . -name "*.mmd" | xargs -P 4 -I {} sh -c \
 
 This agent is typically called:
 1. After `diagram-generator` creates .mmd files
-2. During `/update-architecture` command
-3. During `/create-spec` command
+2. During `/superagents:update-architecture` command
+3. During `/superagents:create-spec` command
 4. As part of documentation workflows
 
 ## Skills Reference

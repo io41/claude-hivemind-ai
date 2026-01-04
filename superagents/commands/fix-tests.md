@@ -2,7 +2,7 @@
 description: Systematically identify and repair failing tests
 ---
 
-# /fix-tests Command
+# /superagents:fix-tests Command
 
 Systematically repair failing tests.
 

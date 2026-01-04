@@ -160,7 +160,7 @@ If move fails:
 ## Integration
 
 This agent is called:
-- At the end of `/work` command after ARCHITECTURE phase
+- At the end of `/superagents:work` command after ARCHITECTURE phase
 - After `architecture` agent completes successfully
 - Before the work agent updates queued.md/completed.md
 

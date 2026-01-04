@@ -42,7 +42,7 @@ Key interfaces and functions.
 
 ## Current Systems
 
-_No systems documented yet. Architecture docs are created automatically after implementing features via `/work`._
+_No systems documented yet. Architecture docs are created automatically after implementing features via `/superagents:work`._
 
 ## Adding Documentation
 

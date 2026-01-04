@@ -2,7 +2,7 @@
 description: Initialize the superagents RPI workflow for this project
 ---
 
-# /setup Command
+# /superagents:setup Command
 
 Initialize or upgrade the superagents RPI workflow for this project.
 
@@ -273,12 +273,12 @@ During upgrade:
 4. Archive old directories (keep for reference but stop using)
 
 **New commands:**
-- `/backlog` - Add work items interactively
-- `/queue-add` - Move from backlog to queue
-- `/queue-status` - Show queue state
+- `/superagents:backlog` - Add work items interactively
+- `/superagents:queue-add` - Move from backlog to queue
+- `/superagents:queue-status` - Show queue state
 
 **Removed:**
-- `/work-until` command (replaced by queue system)
+- `/superagents:work-until` command (replaced by queue system)
 
 #### Future migrations
 Document here as versions are released.
@@ -316,8 +316,8 @@ Setup complete!
 
 Next steps:
 1. Add your requirements to spec/*.md
-2. Run /update-roadmap to generate todos
-3. Run /work to start implementing
+2. Run /superagents:update-roadmap to generate todos
+3. Run /superagents:work to start implementing
 ```
 
 ### Upgrade

@@ -2,7 +2,7 @@
 description: Add a new work item to the backlog interactively
 ---
 
-# /backlog Command
+# /superagents:backlog Command
 
 Add a work item to the backlog. **This command ONLY creates backlog entries - it does NOT investigate, research, or work on the item.**
 
@@ -17,13 +17,13 @@ The description might be a bug report, feature request, or task - treat it as op
 
 ## Arguments
 
-If called with arguments (e.g., `/backlog Fix the login bug`), use the arguments as the description directly. Skip asking for description, just ask for priority.
+If called with arguments (e.g., `/superagents:backlog Fix the login bug`), use the arguments as the description directly. Skip asking for description, just ask for priority.
 
 ## Process
 
 ### 1. Gather Information
 
-**If arguments provided** (e.g., `/backlog Fix the React hooks error`):
+**If arguments provided** (e.g., `/superagents:backlog Fix the React hooks error`):
 - Use arguments as the description (verbatim, do not interpret)
 - Only ask for priority
 
@@ -79,7 +79,7 @@ Display:
   Priority: {priority}
   Location: .agents/work/{slug}/definition.md
 
-  Run /queue-add {slug} to add it to the processing queue.
+  Run /superagents:queue-add {slug} to add it to the processing queue.
 ```
 
 ## Output

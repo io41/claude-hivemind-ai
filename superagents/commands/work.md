@@ -2,7 +2,7 @@
 description: Execute the RPI workflow (Research-Plan-Implement with TDD) for queued items
 ---
 
-# /work Command
+# /superagents:work Command
 
 Process the work queue autonomously until empty.
 

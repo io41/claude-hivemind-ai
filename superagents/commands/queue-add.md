@@ -3,7 +3,7 @@ description: Move work item from backlog to processing queue (haiku model)
 model: haiku
 ---
 
-# /queue-add Command
+# /superagents:queue-add Command
 
 Move a work item from backlog to the processing queue.
 

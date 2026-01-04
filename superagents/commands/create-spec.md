@@ -2,7 +2,7 @@
 description: Question-driven interactive specification creation and amendment workflow with Mermaid diagrams
 ---
 
-# /create-spec Command
+# /superagents:create-spec Command
 
 Create or amend specifications interactively through clarifying questions, generating relevant Mermaid diagrams automatically.
 
@@ -22,7 +22,7 @@ Create or amend specifications interactively through clarifying questions, gener
 Triggered when spec file doesn't exist or user explicitly requests new spec:
 
 ```
-/create-spec user-authentication
+/superagents:create-spec user-authentication
 ```
 
 ### Amend Mode (Update Existing)
@@ -30,7 +30,7 @@ Triggered when spec file doesn't exist or user explicitly requests new spec:
 Triggered when spec file already exists:
 
 ```
-/create-spec user-authentication
+/superagents:create-spec user-authentication
 → Detects spec/user-authentication.md exists
 → Enters amendment mode
 ```
@@ -246,7 +246,7 @@ Updated spec/index.md
 
 ✓ Specification created!
 
-Next: Run /update-roadmap to generate work items
+Next: Run /superagents:update-roadmap to generate work items
 ```
 
 ### Amend Mode
@@ -290,7 +290,7 @@ Changes made:
 - Modified: REQ-002 (Login - added 2FA check)
 - Diagrams updated: user-flow, api-sequence
 
-Next: Run /update-roadmap to update work items
+Next: Run /superagents:update-roadmap to update work items
 ```
 
 ## Question Templates
@@ -374,6 +374,6 @@ When amending specs:
 
 ## Integration
 
-- Specs feed into `/update-roadmap` for work item generation
-- Specs are referenced during `/work` research phase
+- Specs feed into `/superagents:update-roadmap` for work item generation
+- Specs are referenced during `/superagents:work` research phase
 - Architecture docs reference spec requirements
