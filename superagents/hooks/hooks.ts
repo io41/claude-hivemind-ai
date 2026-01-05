@@ -134,13 +134,9 @@ const preToolUse = async (payload: PreToolUsePayload): Promise<PreToolUseRespons
 }
 
 // Stop handler - check if work queue has pending or in-progress items
-const stop = async (payload: StopPayload): Promise<StopResponse> => {
-  const { transcript_path } = payload
-
-  // Extract cwd from transcript_path (transcript is in .claude/transcripts/)
-  const cwd = transcript_path
-    ? path.dirname(path.dirname(transcript_path))
-    : process.cwd()
+const stop = async (_payload: StopPayload): Promise<StopResponse> => {
+  // Hooks are always run from the project directory, so use process.cwd()
+  const cwd = process.cwd()
 
   const queueItem = getNextQueuedItem(cwd)
 
