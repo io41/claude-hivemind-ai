@@ -66,5 +66,5 @@ The command will:
 ## Notes
 
 - Work items are ordered by dependencies
-- Each work item should be 1-5 tests (small batches)
+- Each work item should have comprehensive test coverage (avoid superfluous tests)
 - Dependencies must be completed before dependent items

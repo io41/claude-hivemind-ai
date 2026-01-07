@@ -42,12 +42,15 @@ Use Glob and Grep to find relevant files, then Read them.
 
 ### 3. Right-Size Check (Heijunka)
 
-Estimate test count. If > 5 tests needed:
+Estimate test count. Ensure tests are comprehensive but not superfluous:
+- Tests should cover all important scenarios (happy path, edge cases, error cases)
+- Tests should be focused on behavior, not implementation details
+- Avoid redundant tests that don't add value
 
 ```json
 {
   "success": false,
-  "reason": "Work item too large",
+  "reason": "Work item needs better scoping",
   "testCount": N,
   "suggestedSplit": [
     "Smaller work item 1",
@@ -56,7 +59,7 @@ Estimate test count. If > 5 tests needed:
 }
 ```
 
-Small batches (1-5 tests) ensure consistent flow.
+Properly scoped work items ensure consistent flow with comprehensive coverage.
 
 ### 4. Write Research File
 
@@ -113,7 +116,7 @@ High-level test scenarios:
 1. **You are a leaf agent** - Do NOT spawn other agents
 2. **Do the work yourself** - Read files directly using Read, Glob, Grep
 3. **Just-in-time** - Load only what's needed for this work item
-4. **Right-size** - Flag work items that need splitting (>5 tests)
+4. **Right-size** - Flag work items that need better scoping
 5. **Focused output** - Summary, not exhaustive analysis
 6. **Point to sources** - Reference file paths, don't duplicate content
 

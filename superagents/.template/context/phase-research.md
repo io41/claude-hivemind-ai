@@ -35,8 +35,8 @@ Gather context and analyze requirements before implementation.
    - Load relevant pattern/mistake files
 
 5. **Right-Size Check**
-   - Estimate test count (should be 1-5)
-   - If > 5 tests needed, suggest splitting work item
+   - Estimate test scope (should be comprehensive but not superfluous)
+   - If work item is too large to implement reasonably, suggest splitting
 
 6. **Write Research Artifact**
    - Save to `.agents/research/{work-item-slug}.md`
@@ -76,6 +76,6 @@ Brief recommended approach (1-2 paragraphs).
 ## Key Rules
 
 1. **Just-in-time loading** - Load only what's needed for this work item
-2. **Right-size work** - Flag items needing > 5 tests
+2. **Right-size work** - Flag items that need better scoping
 3. **Focused output** - Summary, not exhaustive analysis
 4. **Point to sources** - Reference files, don't duplicate content

@@ -34,5 +34,5 @@ This keeps the active todo list lean and reduces context usage.
 - [ ] **work-item-slug** - Short description
   - Requirements: REQ-001, REQ-002
   - Dependencies: other-item-slug (if any)
-  - Estimate: 1-5 tests
+  - Tests: Comprehensive coverage (avoid superfluous tests)
 ```

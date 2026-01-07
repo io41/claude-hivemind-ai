@@ -27,7 +27,7 @@ This is your chance to fix the test design. Don't make the same mistakes.
 
 Before starting RED:
 1. Research artifact exists at `.agents/work/{slug}/research.md`
-2. Work item is right-sized (1-5 tests)
+2. Work item is appropriately scoped
 
 ## Gate: Exit
 
@@ -38,12 +38,13 @@ Before committing RED:
 
 ## Right-Size Work Items
 
-Work items should produce **1-5 tests**. This ensures:
-- Consistent flow (no huge items blocking progress)
-- Fast feedback (complete a work item in one session)
-- Clear scope (know when you're done)
+Work items should have **comprehensive test coverage**. This means:
+- Tests cover all important scenarios (happy path, edge cases, errors)
+- Tests are focused on behavior, not implementation details
+- Tests are meaningful and avoid redundancy
+- Better to be over-tested than under-tested
 
-**If a work item needs more than 5 tests, split it.**
+**Split work items if they become too large to implement in a reasonable timeframe.**
 
 ## Test One Behavior at a Time
 

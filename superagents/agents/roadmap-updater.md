@@ -54,7 +54,7 @@ Each completed vertical slice = working, integrated, user-visible functionality.
 ### 2. Group Into Work Items (Vertical Slices)
    - Break features into **end-to-end slices**, not layers
    - Each slice should be: backend + integration + UI/CLI/API
-   - Ensure items are sized for 1-5 tests
+   - Ensure items are appropriately scoped (comprehensive but not superfluous tests)
    - A "done" work item = user can see/use it
 
 ### 3. Prioritize Work Items
@@ -168,5 +168,5 @@ Note: Each phase delivers user-visible functionality, not just backend pieces.
 2. **Early Visibility** - User sees working features as early as possible
 3. **Incremental Integration** - Each item integrates into the running app
 4. **Logical Ordering** - Dependencies respected (but minimized)
-5. **Actionable Items** - Each item implementable in 1-5 tests
+5. **Actionable Items** - Each item has comprehensive, appropriate test coverage
 6. **Complete Coverage** - All requirements included

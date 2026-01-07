@@ -199,7 +199,7 @@ Agents communicate via files in `.agents/`:
 - Output: `.agents/research/{slug}.md`
 
 ### RED (Test-First)
-- Write 1-5 tests per work item
+- Write comprehensive tests per work item (cover all scenarios)
 - Tests must fail correctly
 - No implementation code allowed
 - Commit: `test(<scope>): description`

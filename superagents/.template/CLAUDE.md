@@ -10,7 +10,7 @@ Research-Plan-Implement with TDD. Quality built in, not inspected in.
 2. **Single-Piece Flow** - One test at a time (GREEN), one refactoring at a time (REFACTOR)
 3. **Go and See** - Read actual files before editing. Research can be stale.
 4. **Eliminate Waste** - Write only what tests demand. No speculative code.
-5. **Right-Size Work** - Each work item produces 1-5 tests. Split larger items.
+5. **Right-Size Work** - Each work item has comprehensive, appropriate test coverage. Split if needed.
 6. **Poka-Yoke** - Design code that makes errors impossible, not just catchable.
 
 ## Test Gate
@@ -39,7 +39,7 @@ The `verify-results` agent enforces gates, and `git-commit` handles commits afte
 | Phase | Flow | Gate |
 |-------|------|------|
 | RESEARCH | Read spec, code, architecture | Research artifact written |
-| RED | Write 1-5 tests for work item | Tests fail correctly |
+| RED | Write comprehensive tests for work item | Tests fail correctly |
 | GREEN | Pass one test, then next, **then integrate** | 100% pass, zero type errors, **integrated** |
 | REFACTOR | One change, verify, next | 100% pass, zero type errors |
 | ARCHIVE | Move work dir to archive | Item in completed.md, artifacts archived |
