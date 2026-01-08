@@ -12,6 +12,24 @@ Research-Plan-Implement with TDD. Quality built in, not inspected in.
 4. **Eliminate Waste** - Write only what tests demand. No speculative code.
 5. **Right-Size Work** - Each work item has comprehensive, appropriate test coverage. Split if needed.
 6. **Poka-Yoke** - Design code that makes errors impossible, not just catchable.
+7. **Trust but Verify** - Always verify artifacts exist after agents claim to create them.
+
+## Artifact Gate
+
+**Every phase produces artifacts. Artifacts MUST be verified before proceeding.**
+
+```
+Agent claims write → VERIFY file exists → Has content? → YES → Proceed
+                                              ↓
+                                             NO → STOP. Agent failed.
+```
+
+After `rpi-research` or `rpi-plan` returns:
+1. **Read the file** that should have been created
+2. **Verify content** - file must have >200 characters
+3. **If missing/empty** - STOP immediately. Do not proceed.
+
+An agent claiming to write a file is not proof it was written. Trust but verify.
 
 ## Test Gate
 

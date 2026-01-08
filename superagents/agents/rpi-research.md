@@ -11,6 +11,17 @@ Produces research artifacts that rpi-plan consumes. Context isolation ensures re
 
 Phase-specific research for RPI workflow. Analyzes context and prepares phase-specific research document.
 
+## MANDATORY: You MUST Write the Research File
+
+**THIS IS NON-NEGOTIABLE.** Your primary deliverable is writing `{phase}-research.md`.
+
+- You MUST write `.agents/work/{slug}/{phase}-research.md` before completing
+- You MUST NOT return without writing this file
+- The file MUST have substantive content (>200 characters)
+- Failure to write this file = agent failure
+
+The orchestrator will verify this file exists. If it doesn't, you failed.
+
 ## Input
 
 - `slug` - Work item slug
@@ -146,12 +157,20 @@ Priority ordered:
 
 ## Output
 
+**BEFORE returning, you MUST:**
+1. Verify you wrote the research file using the Read tool
+2. Confirm file has >200 characters of content
+
 ```json
 {
   "researchFile": ".agents/work/{slug}/{phase}-research.md",
+  "fileWritten": true,
+  "contentLength": <number of characters>,
   "summary": "Brief summary of phase-specific findings"
 }
 ```
+
+If `fileWritten` is false or `contentLength` < 200, you have failed. Do not return until you have written the file.
 
 ## Token Budget
 

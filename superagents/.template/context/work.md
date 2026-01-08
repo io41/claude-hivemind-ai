@@ -6,6 +6,17 @@ Read this file when running `/superagents:work`. Follow it exactly. Do not ask t
 
 **DO NOT STOP between phases.** Execute steps 1→2→3→4→5→6→7→8 in one continuous flow.
 
+## Critical: Mandatory Artifact Verification
+
+**EVERY phase produces artifacts. VERIFY artifacts exist before proceeding.**
+
+After each `rpi-research` or `rpi-plan` agent completes:
+1. **Read the file** that should have been created
+2. **Verify content** - file must have >200 characters of meaningful content
+3. **If missing or empty**: STOP immediately. Do not proceed. Report the failure.
+
+This is non-negotiable. An agent claiming to write a file is not proof it was written.
+
 Each work item requires ALL phases to complete:
 ```
 Get Item → Research → RED → GREEN-VALIDATE → GREEN → REFACTOR → Architecture → Archive → Check for More
@@ -63,9 +74,19 @@ Task(superagents:rpi-research, "{slug} phase=red")
   Reads: research.md, the code
   Writes: red-research.md
 
+VERIFY: Read .agents/work/{slug}/red-research.md
+  - File MUST exist
+  - File MUST have >200 chars of content
+  - If missing/empty: STOP. Agent failed. Report error.
+
 Task(superagents:rpi-plan, "{slug} phase=red")
   Reads: red-research.md
   Writes: red-plan.md
+
+VERIFY: Read .agents/work/{slug}/red-plan.md
+  - File MUST exist
+  - File MUST have >200 chars of content
+  - If missing/empty: STOP. Agent failed. Report error.
 
 Task(superagents:rpi-implement, "{slug} phase=red")
   Reads: red-plan.md
@@ -93,10 +114,21 @@ Task(superagents:rpi-research, "{slug} phase=green")
   Reads: research.md, the code, report.md
   Writes: green-research.md
 
+VERIFY: Read .agents/work/{slug}/green-research.md
+  - File MUST exist
+  - File MUST have >200 chars of content
+  - If missing/empty: STOP. Agent failed. Report error.
+
 Task(superagents:rpi-plan, "{slug} phase=green")
   Reads: green-research.md
   Writes: green-plan.md
   MUST include integration point
+
+VERIFY: Read .agents/work/{slug}/green-plan.md
+  - File MUST exist
+  - File MUST have >200 chars of content
+  - File MUST contain "Integration" section
+  - If missing/empty/no-integration: STOP. Agent failed. Report error.
 ```
 
 #### 4.1 Test Validation (Pre-Implementation)
@@ -176,9 +208,19 @@ Task(superagents:rpi-research, "{slug} phase=refactor")
   Reads: research.md, the code, report.md
   Writes: refactor-research.md
 
+VERIFY: Read .agents/work/{slug}/refactor-research.md
+  - File MUST exist
+  - File MUST have >200 chars of content
+  - If missing/empty: STOP. Agent failed. Report error.
+
 Task(superagents:rpi-plan, "{slug} phase=refactor")
   Reads: refactor-research.md
   Writes: refactor-plan.md
+
+VERIFY: Read .agents/work/{slug}/refactor-plan.md
+  - File MUST exist
+  - File MUST have >200 chars of content
+  - If missing/empty: STOP. Agent failed. Report error.
 
 Task(superagents:rpi-implement, "{slug} phase=refactor")
   Reads: refactor-plan.md

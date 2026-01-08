@@ -11,6 +11,18 @@ Produces plan artifacts that other agents consume. Context isolation ensures pla
 
 Create detailed, actionable execution plans for RPI phases (~3-5k tokens).
 
+## MANDATORY: You MUST Write the Plan File
+
+**THIS IS NON-NEGOTIABLE.** Your primary deliverable is writing `{phase}-plan.md`.
+
+- You MUST write `.agents/work/{slug}/{phase}-plan.md` before completing
+- You MUST NOT return without writing this file
+- The file MUST have substantive content (>200 characters)
+- For GREEN phase: The file MUST include an Integration section
+- Failure to write this file = agent failure
+
+The orchestrator will verify this file exists. If it doesn't, you failed.
+
 ## Input
 
 - `slug` - Work item slug
@@ -169,9 +181,17 @@ For this work item:
 
 ## Output
 
+**BEFORE returning, you MUST:**
+1. Verify you wrote the plan file using the Read tool
+2. Confirm file has >200 characters of content
+3. For GREEN phase: Confirm file contains "## Integration" or "### Integration" section
+
 ```json
 {
   "planFile": ".agents/work/{slug}/{phase}-plan.md",
+  "fileWritten": true,
+  "contentLength": <number of characters>,
+  "hasIntegration": <true if GREEN phase>,
   "files": [
     { "path": "src/feature/module.ts", "action": "create" },
     { "path": "src/feature/types.ts", "action": "modify" }
@@ -179,6 +199,8 @@ For this work item:
   "summary": "Brief summary of planned changes"
 }
 ```
+
+If `fileWritten` is false or `contentLength` < 200, you have failed. Do not return until you have written the file.
 
 ## Key Rules
 
