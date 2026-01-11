@@ -153,12 +153,17 @@ Task(superagents:git-commit, "phase=refactor workItem={slug}")
 
 **→ Step 6**
 
-### 6. Architecture
+### 6. Architecture (Optional)
 
+**Check `.agents/CLAUDE.md` for "Architecture phase:" setting.**
+
+If **on**:
 ```
 Task(superagents:architecture, "{slug}")
 Task(superagents:git-commit, "phase=docs workItem={slug}")
 ```
+
+If **off**: Skip this step.
 
 **→ Step 7**
 

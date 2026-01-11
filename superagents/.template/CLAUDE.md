@@ -61,6 +61,12 @@ backlog.md → queued.md → completed.md
 | Spec | `spec/` |
 | Architecture | `architecture/` |
 
+## Options
+
+<!-- superagents:options -->
+- **Architecture phase:** on
+<!-- /superagents:options -->
+
 ## Git
 
 <!-- superagents:git-config -->
@@ -85,3 +91,4 @@ backlog.md → queued.md → completed.md
 - `/superagents:update-architecture` - Update docs
 - `/superagents:create-spec` - Create/amend spec
 - `/superagents:janitor` - Clean up stale files
+- `/superagents:set-architecture` - Toggle architecture phase on/off
