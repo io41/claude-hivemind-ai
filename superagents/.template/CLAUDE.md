@@ -2,194 +2,86 @@
 
 <!-- superagents:1.2.0 -->
 
-Research-Plan-Implement with TDD. Quality built in, not inspected in.
+Research-Plan-Implement with TDD.
 
 ## Core Principles
 
-1. **Stop for Quality** - All tests MUST pass before commit. No exceptions.
-2. **Single-Piece Flow** - One test at a time (GREEN), one refactoring at a time (REFACTOR)
-3. **Go and See** - Read actual files before editing. Research can be stale.
-4. **Eliminate Waste** - Write only what tests demand. No speculative code.
-5. **Right-Size Work** - Each work item has comprehensive, appropriate test coverage. Split if needed.
-6. **Poka-Yoke** - Design code that makes errors impossible, not just catchable.
-7. **Trust but Verify** - Always verify artifacts exist after agents claim to create them.
-
-## Artifact Gate
-
-**Every phase produces artifacts. Artifacts MUST be verified before proceeding.**
-
-```
-Agent claims write → VERIFY file exists → Has content? → YES → Proceed
-                                              ↓
-                                             NO → STOP. Agent failed.
-```
-
-After `rpi-research` or `rpi-plan` returns:
-1. **Read the file** that should have been created
-2. **Verify content** - file must have >200 characters
-3. **If missing/empty** - STOP immediately. Do not proceed.
-
-An agent claiming to write a file is not proof it was written. Trust but verify.
-
-## Test Gate
-
-**All tests MUST pass AND code MUST be integrated before committing GREEN or REFACTOR phases.**
-
-```
-Run tests → All pass? → YES → Integration check? → YES → Commit allowed
-                ↓                              ↓
-               NO → Fix → Run again → Repeat    NO → Wire into app → Repeat
-```
-
-The `verify-results` agent enforces gates, and `git-commit` handles commits after each phase.
+1. **Stop for Quality** - All tests MUST pass before commit
+2. **Single-Piece Flow** - One test/refactoring at a time
+3. **Go and See** - Read actual files before editing
+4. **Eliminate Waste** - Write only what tests demand
+5. **Trust but Verify** - Verify artifacts exist after agents claim to create them
 
 ## Workflow
 
 ```
-/superagents:work → research → RED → GREEN → REFACTOR → architecture → archive
-                    ↓       ↓         ↓            ↓           ↓
-                 tests   one test   one change   docs    move to
-                 fail    at a time  at a time   update   archive/
+/superagents:work → research → RED → GREEN → REFACTOR → archive
 ```
 
-## Phase Rules
+| Phase | Do | Gate |
+|-------|-----|------|
+| RESEARCH | Read spec, code, architecture | Artifact written |
+| RED | Write tests | Tests fail correctly (assertions) |
+| GREEN | Pass tests, **integrate** | 100% pass, integrated |
+| REFACTOR | Improve quality | 100% pass |
 
-| Phase | Flow | Gate |
-|-------|------|------|
-| RESEARCH | Read spec, code, architecture | Research artifact written |
-| RED | Write comprehensive tests for work item | Tests fail correctly |
-| GREEN | Pass one test, then next, **then integrate** | 100% pass, zero type errors, **integrated** |
-| REFACTOR | One change, verify, next | 100% pass, zero type errors |
-| ARCHIVE | Move work dir to archive | Item in completed.md, artifacts archived |
+**Integration is mandatory.** GREEN incomplete until code is wired into app.
 
-### GREEN Phase Integration Requirement
+## Artifact Verification
 
-**Integration is an implementation step, not just a verification.**
+After each agent: READ the file it claims to create. >200 chars. Missing = STOP.
 
-GREEN phase is NOT complete until:
-1. All tests pass (100%)
-2. Zero type errors
-3. **Code is wired into the application** (user can access the feature)
-
-Dead code = incomplete GREEN phase. The plan MUST specify the integration point, and implementation MUST include adding the code to that integration point.
-
-## Queue System
-
-Work flows through a queue:
+## Queue
 
 ```
 backlog.md → queued.md → completed.md
-     ↓           ↓            ↓
-  waiting    processing    finished
 ```
 
-- `/superagents:queue-add` moves items from backlog to queue
-- `/superagents:work` processes items from queue (auto-continues until empty)
-- Completed items archived to `.agents/archive/<slug>/`
+- `/superagents:queue-add` moves backlog → queue
+- `/superagents:work` processes queue (continues until empty)
+- Completed → `.agents/archive/`
 
-## Workflow Artifacts
+## Work Item Types
 
-Each work item has its own directory with all artifacts:
-
-```
-.agents/work/<slug>/
-├── definition.md       # Work item description
-├── research.md         # Master research
-├── red-research.md     # RED phase research
-├── red-plan.md         # RED phase plan
-├── green-research.md   # GREEN phase research
-├── green-plan.md       # GREEN phase plan
-├── refactor-research.md
-├── refactor-plan.md
-└── report.md           # Combined results
-```
+| Type | Slug | Workflow |
+|------|------|----------|
+| **Atomic** | `{slug}` | Full RPI |
+| **Research** | `research-{slug}` | Breakdown only → creates atomic items |
 
 ## Key Files
 
 | Purpose | Path |
 |---------|------|
-| Backlog (waiting) | `.agents/work/backlog.md` |
-| Queue (processing) | `.agents/work/queued.md` |
-| Completed | `.agents/work/completed.md` |
-| Work items | `.agents/work/<slug>/` |
-| **Archived work** | `.agents/archive/<slug>/` |
+| Backlog | `.agents/work/backlog.md` |
+| Queue | `.agents/work/queued.md` |
+| Work items | `.agents/work/{slug}/` |
+| Archive | `.agents/archive/` |
 | Phase guidance | `.agents/context/phase-*.md` |
-| Artifact guidance | `.agents/context/artifacts.md` |
-| Patterns | `.agents/patterns/` |
-| Mistakes to avoid | `.agents/mistakes/` |
-| Requirements | `spec/` |
+| Formats | `.agents/context/artifacts.md` |
+| Spec | `spec/` |
 | Architecture | `architecture/` |
 
-## Index Files
-
-Each directory has an `index.md` for fast navigation:
-```
-<filename> -- <short description> -- <comma,separated,tags>
-```
-
-Read index files first to find relevant files without searching.
-
-## Archiving Completed Work
-
-**Goal**: Minimize context usage by keeping active files lean.
-
-When a work item completes:
-1. **Moved** entire `.agents/work/<slug>/` to `.agents/archive/<slug>/`
-2. **Removed** from `queued.md`
-3. **Added** to `completed.md`
-4. **Entry added** to `.agents/archive/index.md`
-
-### Archive Structure
-
-```
-.agents/archive/
-├── index.md             # List of archived work items
-├── auth-system/         # Archived work item
-│   ├── definition.md
-│   ├── research.md
-│   ├── *-research.md
-│   ├── *-plan.md
-│   └── report.md
-└── user-profile/        # Another archived item
-    └── ...
-```
-
-### Why Archive?
-
-- `queued.md` only shows pending/in-progress work
-- `backlog.md` only shows waiting items
-- Work directories only contain active work
-- Context window usage minimized when checking "what's next"
-
-To view history: read `.agents/archive/index.md`
-
-## Git Workflow
+## Git
 
 <!-- superagents:git-config -->
 - **Mode:** direct
 - **Branch prefix:** feature
-- **PR target:** (not applicable)
 <!-- /superagents:git-config -->
-
-### Mode Reference
 
 | Mode | Behavior |
 |------|----------|
-| `direct` | Commits go to current branch immediately |
-| `feature-squash` | Create `<prefix>/<slug>` branch, squash merge when done, delete branch |
-| `feature-pr` | Create `<prefix>/<slug>` branch, open PR when done |
-
-The `git-commit` agent reads this config and acts accordingly. The `archive-work` agent handles end-of-work-item actions (squash merge or PR).
+| `direct` | Commit to current branch |
+| `feature-squash` | Create branch, squash merge |
+| `feature-pr` | Create branch, open PR |
 
 ## Commands
 
-- `/superagents:work` - Execute RPI workflow (continues until queue empty)
-- `/superagents:backlog` - Add work items interactively
-- `/superagents:queue-add` - Move items from backlog to queue
-- `/superagents:queue-status` - Show current queue state
-- `/superagents:update-roadmap` - Generate roadmap and backlog from spec
-- `/superagents:project-status` - Show current state
-- `/superagents:fix-tests` - Systematic test repair
-- `/superagents:update-architecture` - Update architecture docs with diagrams
-- `/superagents:create-spec` - Interactive spec creation/amendment
-- `/superagents:janitor` - Clean up stale files and orphaned work items
+- `/superagents:work` - Execute RPI (continues until empty)
+- `/superagents:backlog` - Add work items
+- `/superagents:queue-add` - Move to queue
+- `/superagents:queue-status` - Show queue
+- `/superagents:update-roadmap` - Generate from spec
+- `/superagents:fix-tests` - Repair failing tests
+- `/superagents:update-architecture` - Update docs
+- `/superagents:create-spec` - Create/amend spec
+- `/superagents:janitor` - Clean up stale files

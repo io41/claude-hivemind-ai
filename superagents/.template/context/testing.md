@@ -1,43 +1,26 @@
 # Testing Guidelines
 
-Conventions and patterns for tests in this project.
+## Co-Location
 
-## Test Co-Location
+Tests live next to source: `AuthService.ts` → `AuthService.test.ts`
 
-Tests live next to the code they test:
+## Naming
 
-```
-src/
-  auth/
-    AuthService.ts
-    AuthService.test.ts    ← Next to source
-    types.ts
-  components/
-    Button.tsx
-    Button.test.tsx        ← Next to source
-```
+- `*.test.ts` for TypeScript
+- `*.test.tsx` for React
+- `__tests__/` only for integration tests
 
-**Why**: Easy to find, modify together, clear ownership.
-
-## File Naming
-
-- `*.test.ts` for TypeScript tests
-- `*.test.tsx` for React component tests
-- `__tests__/` directory only for integration tests
-
-## Test Structure
+## Structure
 
 ```typescript
-describe('ModuleName', () => {
-  describe('functionName', () => {
+describe('Module', () => {
+  describe('function', () => {
     describe('when condition', () => {
-      it('should expected behavior', () => {
+      it('should behavior', () => {
         // Arrange
         const input = createTestData()
-
         // Act
-        const result = functionName(input)
-
+        const result = fn(input)
         // Assert
         expect(result).toBe(expected)
       })
@@ -46,96 +29,55 @@ describe('ModuleName', () => {
 })
 ```
 
-## Naming Conventions
-
-Test names should read like documentation:
+## Naming Tests
 
 ```typescript
 // Good
 it('returns null when user not found')
 it('throws AuthError for invalid credentials')
-it('emits event after successful login')
 
 // Bad
 it('test1')
 it('works')
-it('should work correctly')
 ```
 
-## One Assertion Per Test
-
-When possible, each test verifies one thing:
+## One Behavior Per Test
 
 ```typescript
-// Good
-it('returns user ID', () => {
-  expect(user.id).toBe('123')
-})
+// Good - separate tests
+it('returns user ID', () => expect(user.id).toBe('123'))
+it('returns user email', () => expect(user.email).toBe('test@example.com'))
 
-it('returns user email', () => {
-  expect(user.email).toBe('test@example.com')
-})
-
-// Acceptable for related properties
-it('returns user profile', () => {
-  expect(user).toEqual({
-    id: '123',
-    email: 'test@example.com'
-  })
-})
+// OK for related properties
+it('returns user profile', () => expect(user).toEqual({ id: '123', email: 'test@example.com' }))
 ```
 
 ## Test Data Builders
 
-For complex test data, use builders:
-
 ```typescript
 function createUser(overrides?: Partial<User>): User {
-  return {
-    id: 'default-id',
-    email: 'default@example.com',
-    name: 'Default User',
-    ...overrides
-  }
+  return { id: 'default-id', email: 'default@example.com', ...overrides }
 }
-
-// Usage
-const user = createUser({ name: 'Custom Name' })
 ```
 
 ## Mocking
 
 Mock external dependencies, not internal modules:
-
 ```typescript
-// Good - mock external service
-vi.mock('./externalApi')
-
-// Avoid - mock internal module (test the real thing)
-vi.mock('./utils')
+vi.mock('./externalApi')  // Good
+// vi.mock('./utils')     // Avoid - test real thing
 ```
 
-## Async Tests
+## Isolation
 
-Use async/await consistently:
+Each test:
+- Sets up own data
+- Cleans up after
+- Doesn't depend on other tests
+- No shared mutable state
 
-```typescript
-it('fetches user data', async () => {
-  const user = await service.getUser('123')
-  expect(user.id).toBe('123')
-})
-```
+## Coverage
 
-## Test Isolation
-
-Each test should:
-- Set up its own data
-- Clean up after itself
-- Not depend on other tests
-- Not share mutable state
-
-## Coverage Targets
-
-- Aim for 80%+ code coverage
+- Aim 80%+
 - Focus on behavior, not lines
 - Don't test implementation details

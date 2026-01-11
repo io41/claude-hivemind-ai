@@ -1,138 +1,59 @@
 # REFACTOR Phase
 
-Improve code quality while preserving behavior. One change at a time.
+Improve code quality. One change at a time. Preserve behavior.
 
 ## Artifacts
 
-### Read Before Starting
-- `.agents/work/{slug}/research.md` - Research findings
-- `.agents/work/{slug}/red-plan.md` - Test plan
-- `.agents/work/{slug}/green-plan.md` - Implementation plan
+**Read:** `research.md`, `red-plan.md`, `green-plan.md`
+**Write:** `refactor-plan.md`
 
-### Write Before Executing
-- `.agents/work/{slug}/refactor-plan.md` - Refactoring plan
+## Gates
 
-## Gate: Entry
-
-Before starting REFACTOR:
-1. GREEN phase committed
-2. All tests passing (100%)
-3. Zero TypeScript errors
-
-## Gate: Exit
-
-Before committing REFACTOR:
-1. All tests still passing (100%)
-2. Zero TypeScript errors
-3. Code quality improved
+**Entry:** GREEN committed, 100% tests pass, zero type errors
+**Exit:** 100% tests still pass, zero type errors, quality improved
 
 ## Single-Piece Flow
 
-Make **one change at a time**:
+1. Identify improvement
+2. Apply ONE refactoring
+3. Run tests
+4. If fail: UNDO, try different approach
+5. Next improvement
 
-1. Identify improvement opportunity
-2. Apply refactoring
-3. Run tests to verify behavior preserved
-4. If tests fail: UNDO and try different approach
-5. Move to next improvement
+**Never batch refactorings.** Isolates problems.
 
-**Never batch multiple refactorings.** This isolates problems.
+## Safe Refactorings (Prefer)
 
-## Safe Refactorings
+**Very Low Risk:** Rename variable/function, extract constant, remove unused code, add types
+**Low Risk:** Extract function, inline function, move function, simplify conditional
+**Medium Risk:** Extract class/module, change signature, replace algorithm
+**High Risk (Avoid):** Restructure module, change data structures, modify shared deps
 
-Prefer low-risk refactorings:
+## Common Refactorings
 
-### Very Low Risk
-- Rename variable/function
-- Extract constant
-- Remove unused code
-- Add type annotations
+**Extract Function:** Code does multiple things → split
+**Rename:** `d` → `currentDate`
+**Remove Duplication:** Same code in multiple places → extract shared function
 
-### Low Risk
-- Extract function
-- Inline function
-- Move function to better location
-- Simplify conditional
+## Skip Refactoring If
 
-### Medium Risk
-- Extract class/module
-- Change function signature
-- Replace algorithm
-
-### High Risk (Avoid)
-- Restructure entire module
-- Change data structures
-- Modify shared dependencies
-
-## Refactoring Catalog
-
-Common refactorings to consider:
-
-**Extract Function**: Code does multiple things
-```typescript
-// Before
-function process() {
-  // validate
-  if (!x) throw new Error()
-  // calculate
-  const result = x * 2
-  // format
-  return `Result: ${result}`
-}
-
-// After
-function process() {
-  validate()
-  const result = calculate()
-  return format(result)
-}
-```
-
-**Rename for Clarity**: Names don't describe purpose
-```typescript
-// Before
-const d = new Date()
-
-// After
-const currentDate = new Date()
-```
-
-**Remove Duplication**: Same code in multiple places
-```typescript
-// Before
-function a() { /* shared logic */ }
-function b() { /* same shared logic */ }
-
-// After
-function shared() { /* shared logic */ }
-function a() { shared() }
-function b() { shared() }
-```
-
-## What NOT to Refactor
-
-Skip refactoring if:
 - Code works and is readable
-- Change would be high risk
-- Benefit is unclear
+- Change is high risk
+- Benefit unclear
 - Tests don't cover the area
 
 ## Verification
 
-After each refactoring:
 ```bash
-bun test  # Must still be 100% passing
-tsc --noEmit  # Must still have zero errors
+bun test      # Still 100%
+tsc --noEmit  # Still zero errors
 ```
 
 ## Commit
 
-When refactoring complete:
 ```
 refactor(scope): improve code quality
 
-- Extracted X function
-- Renamed Y for clarity
-- Removed duplication in Z
+- What was refactored
 - All tests still passing (N/N)
 ```

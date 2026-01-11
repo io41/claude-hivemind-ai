@@ -1,291 +1,124 @@
 ---
 description: Research phase agent - gathers context for a work item (leaf agent)
-capabilities: ["research", "context-gathering", "spec-analysis", "right-sizing", "task-breakdown"]
+capabilities: ["research", "context-gathering", "spec-analysis", "task-breakdown"]
 ---
 
 # Agent: work-research
 
-**Leaf agent** - Does the research directly. Does NOT spawn other agents.
+**Leaf agent** - Does research directly. Does NOT spawn other agents.
 
 ## Input
 
-- `slug` - Work item slug (directory name in `.agents/work/`)
+- `slug` - Work item slug (directory in `.agents/work/`)
 
 ## Output
 
-**For Atomic Items:**
-- `researchFile` - Path to saved research (`.agents/work/{slug}/research.md`)
-- `testCount` - Estimated number of tests (for right-sizing check)
-- `summary` - Brief overview
-- `type` - "atomic"
-
-**For Research Items:**
-- `breakdownFile` - Path to breakdown (`.agents/work/{slug}/breakdown.md`)
-- `createdItems` - List of atomic work items created
-- `summary` - Brief overview
-- `type` - "research"
+**Atomic:** `{ type: "atomic", researchFile, testCount, summary }`
+**Research:** `{ type: "research", breakdownFile, createdItems[], summary }`
 
 ## Process
 
-### 1. Load Work Item Definition
+### 1. Load Definition
 
-Read `.agents/work/{slug}/definition.md`:
-- Extract description
-- Extract acceptance criteria
-- **Check the `## Type` field** - determines workflow
+Read `.agents/work/{slug}/definition.md` and check `## Type` field.
 
 ### 2. Route by Type
 
-**If Type = "research":** Go to [Research Item Workflow](#research-item-workflow)
-**If Type = "atomic":** Go to [Atomic Item Workflow](#atomic-item-workflow)
+- **type: atomic** → [Atomic Workflow](#atomic-workflow)
+- **type: research** → [Research Workflow](#research-workflow)
 
 ---
 
-## Atomic Item Workflow
+## Atomic Workflow
 
-Standard research for implementation.
+### A1. Gather Context
 
-### A1. Gather Context (Do This Yourself)
+Read directly (no sub-agents):
 
-Read these files directly (do NOT spawn sub-agents):
+| Source | Extract |
+|--------|---------|
+| `spec/*.md` | Relevant requirements |
+| `architecture/*.md` | Integration points |
+| `src/` | Related patterns |
+| `.agents/patterns/` | Applicable patterns |
+| `.agents/mistakes/` | Warnings |
 
-| File/Directory | What to Extract |
-|----------------|-----------------|
-| `spec/*.md` | Requirements relevant to this work item |
-| `architecture/*.md` | System context, integration points |
-| `src/` | Related existing code patterns |
-| `.agents/patterns/index.md` | Applicable patterns |
-| `.agents/mistakes/index.md` | Warnings to avoid |
+### A2. Right-Size Check
 
-Use Glob and Grep to find relevant files, then Read them.
+Verify atomic scope: 1-5 tests, clear scope. If too large, return error.
 
-### A2. Right-Size Validation
+### A3. Write Research
 
-Verify this item is truly atomic:
-- Tests should be 1-5 maximum
-- Scope should be clear and focused
-- If item seems too large, return error (should have been a research item)
+Save to `.agents/work/{slug}/research.md` (format in artifacts.md).
 
-```json
-{
-  "success": false,
-  "reason": "Work item too large for atomic - should be research type",
-  "testCount": N,
-  "suggestedSplit": [
-    "Smaller work item 1",
-    "Smaller work item 2"
-  ]
-}
-```
-
-### A3. Write Research File
-
-Save to `.agents/work/{slug}/research.md`:
-
-```markdown
-# Research: {slug}
-
-## Work Item
-{description from definition.md}
-
-## Scope
-- Estimated tests: N
-- Files to modify: [list]
-- New files needed: [list]
-
-## Requirements
-From spec:
-- Requirement 1
-- Requirement 2
-
-## Architecture Context
-- Relevant system: X
-- Integration points: Y
-
-## Existing Code Patterns
-- Pattern found in src/X
-- Similar implementation in src/Y
-
-## Risks
-- Risk 1 (mitigation)
-
-## Approach
-Brief recommended approach for implementation.
-
-## Test Cases
-High-level test scenarios:
-1. Test case 1
-2. Test case 2
-```
-
-### A4. Return Result
+### A4. Return
 
 ```json
-{
-  "type": "atomic",
-  "researchFile": ".agents/work/{slug}/research.md",
-  "testCount": 3,
-  "summary": "Brief description of work item scope"
-}
+{ "type": "atomic", "researchFile": ".agents/work/{slug}/research.md", "testCount": 3, "summary": "..." }
 ```
 
 ---
 
-## Research Item Workflow
+## Research Workflow
 
-Break down a complex task into atomic work items.
+Break down complex task into atomic items.
 
-### R1. Deep Context Gathering
+### R1. Deep Context
 
-This requires MORE thorough research than atomic items:
+Read ALL related files in spec/, architecture/, src/. Use Glob/Grep extensively.
 
-| File/Directory | What to Extract |
-|----------------|-----------------|
-| `spec/*.md` | ALL requirements related to the feature |
-| `architecture/*.md` | System architecture, all integration points |
-| `src/` | ALL related code, patterns, dependencies |
-| `.agents/patterns/index.md` | Patterns that might apply |
-| `.agents/mistakes/index.md` | Warnings to consider |
+### R2. Decompose
 
-Use Glob and Grep extensively. Read multiple files.
+Break into atomic sub-tasks. Each MUST:
+- Have 1-5 tests
+- Have clear scope
+- Be independently valuable
+- Touch limited files
 
-### R2. Analyze and Decompose
+Consider: logical components, dependencies, execution order.
 
-Break down the original request into atomic sub-tasks:
+### R3. Write Breakdown
 
-**Each atomic task MUST:**
-- Be completable in a single focused session
-- Have 1-5 tests maximum
-- Have clear, unambiguous scope
-- Touch a limited number of files
-- Be independently valuable (no half-finished features)
+Save to `.agents/work/{slug}/breakdown.md` (format in artifacts.md).
 
-**Consider:**
-- What are the logical components?
-- What are the dependencies between components?
-- What can be done in parallel vs. sequential?
-- What order minimizes integration complexity?
+### R4. Create Atomic Items
 
-### R3. Write Breakdown File
+For each item in breakdown:
+1. Create `.agents/work/{item-slug}/definition.md`
+2. Set `## Type` to `atomic`
+3. Set `## Parent Research` to original slug
+4. Inherit priority from parent
 
-Save to `.agents/work/{slug}/breakdown.md`:
-
-```markdown
-# Breakdown: {slug}
-
-## Original Request
-{from definition.md - Original Request section}
-
-## Analysis Summary
-{what was discovered - architecture, existing patterns, integration points}
-
-## Atomic Work Items
-
-### 1. {short-title}
-- **Slug**: {slug-1}
-- **Description**: {clear description of what this item does}
-- **Acceptance Criteria**:
-  - [ ] Criterion 1
-  - [ ] Criterion 2
-- **Estimated Tests**: N (1-5)
-- **Files**: {list of files likely to be touched}
-- **Dependencies**: {other items this depends on, or "none"}
-
-### 2. {short-title}
-- **Slug**: {slug-2}
-- **Description**: {clear description}
-- **Acceptance Criteria**:
-  - [ ] Criterion 1
-- **Estimated Tests**: N
-- **Files**: {list}
-- **Dependencies**: {slug-1} (if applicable)
-
-(continue for all items)
-
-## Recommended Order
-1. {slug-1} - {reason - e.g., "foundational, no dependencies"}
-2. {slug-2} - {reason - e.g., "depends on slug-1"}
-...
-
-## Notes
-{any important context, warnings, or considerations for implementation}
-```
-
-### R4. Create Atomic Work Items
-
-For EACH item in the breakdown, create a work item directory:
-
-**Create `.agents/work/{item-slug}/definition.md`:**
-
-```markdown
-# {Description}
-
-## Priority
-{inherit from parent research item}
-
-## Type
-atomic
-
-## Description
-{from breakdown}
-
-## Acceptance Criteria
-{from breakdown}
-
-## Parent Research
-{original research slug}
-
-## Created
-{timestamp}
-```
-
-### R5. Add Items to Backlog
+### R5. Update Backlog
 
 Edit `.agents/work/backlog.md`:
-- Add each atomic item to the appropriate priority section
-- Format: `- **{slug}** -- {short description}`
-- Items should be listed in recommended order
+- Add each atomic item to priority section
+- Format: `- **{slug}** -- {description}`
 
 ### R6. Write Report
 
 Save to `.agents/work/{slug}/report.md`:
-
 ```markdown
 # Research Report: {slug}
 
-## Original Request
-{what the user asked for}
-
 ## Breakdown Summary
-Analyzed and broke down into {N} atomic work items.
+Created {N} atomic work items.
 
-## Created Work Items
-1. **{slug-1}** - {description}
-2. **{slug-2}** - {description}
-...
-
-## Recommended Execution Order
-{from breakdown}
-
-## Notes
-{any important context}
+## Created Items
+1. **{slug}** - {description}
 
 ## Status
 Complete - ready for archive
 ```
 
-### R7. Return Result
+### R7. Return
 
 ```json
 {
   "type": "research",
   "breakdownFile": ".agents/work/{slug}/breakdown.md",
-  "reportFile": ".agents/work/{slug}/report.md",
-  "createdItems": [
-    {"slug": "slug-1", "description": "...", "priority": "high"},
-    {"slug": "slug-2", "description": "...", "priority": "high"}
-  ],
-  "summary": "Broke down '{original request}' into N atomic work items"
+  "createdItems": [{"slug": "...", "description": "...", "priority": "..."}],
+  "summary": "Broke down into N atomic items"
 }
 ```
 
@@ -293,22 +126,8 @@ Complete - ready for archive
 
 ## Key Rules
 
-1. **You are a leaf agent** - Do NOT spawn other agents
-2. **Do the work yourself** - Read files directly using Read, Glob, Grep
-3. **Check the Type field** - Route to correct workflow
-4. **Atomic items must be small** - 1-5 tests, focused scope
-5. **Research items create backlog** - Don't just analyze, CREATE the items
-6. **Point to sources** - Reference file paths, don't duplicate content
-7. **Independent value** - Each atomic item should be deployable alone
-
-## Token Budget
-
-**Atomic Items:**
-- Input: ~3k tokens (definition + selective context)
-- Peak: ~12k tokens (with spec/architecture content)
-- Output: ~500 tokens (summary + research file)
-
-**Research Items:**
-- Input: ~3k tokens (definition)
-- Peak: ~20k tokens (extensive codebase analysis)
-- Output: ~2k tokens (breakdown file + multiple definitions)
+1. **Leaf agent** - no sub-agents
+2. **Check Type field** - route correctly
+3. **Atomic = small** - 1-5 tests max
+4. **Research = create items** - don't just analyze, CREATE backlog entries
+5. **Reference sources** - point to file paths, don't duplicate
